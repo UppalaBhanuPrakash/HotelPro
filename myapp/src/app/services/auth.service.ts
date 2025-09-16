@@ -17,9 +17,6 @@ export class AuthService {
       this.currentUserSubject.next(JSON.parse(savedUser));
     }
   }
-
-  
-
   //  Existing SignIn (unchanged)
   signIn(email: string, password: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
@@ -186,47 +183,7 @@ export class AuthService {
     });
   }
 
-  //  Update Email
-  // updateEmail(newEmail: string): Promise<boolean> {
-  //   return new Promise((resolve, reject) => {
-  //     const currentUser = this.currentUserSubject.value;
-
-  //     if (!currentUser) {
-  //       reject('No logged-in user');
-  //       return;
-  //     }
-
-  //     // 1. Check if new email already exists
-  //     this.http.get<User[]>(`${this.baseUrl}?email=${newEmail}`).subscribe({
-  //       next: (existingUsers) => {
-  //         if (existingUsers.length > 0) {
-  //           reject('Email already in use');
-  //           return;
-  //         }
-
-  //         // 2. Prepare updated user
-  //         const updatedUser = { ...currentUser, email: newEmail };
-
-  //         // 3. Update in JSON server
-  //         this.http.put<User>(`${this.baseUrl}/${currentUser.id}`, updatedUser).subscribe({
-  //           next: (response) => {
-  //             this.currentUserSubject.next(response);
-  //             localStorage.setItem('currentUser', JSON.stringify(response));
-  //             resolve(true);
-  //           },
-  //           error: (err) => {
-  //             console.error('Error updating email:', err);
-  //             reject(false);
-  //           },
-  //         });
-  //       },
-  //       error: (err) => {
-  //         console.error('Error checking new email:', err);
-  //         reject(false);
-  //       },
-  //     });
-  //   });
-  // }
+ 
   //  Fetch all users (optional helper)
   getAllUsers() {
     return this.http.get<User[]>(this.baseUrl);
@@ -237,14 +194,7 @@ export class AuthService {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
 
-  //  Change password (same as before, can later integrate with JSON server)
-  // changePassword(currentPassword: string, newPassword: string): Promise<boolean> {
-  //   return new Promise((resolve) => {
-  //     setTimeout(() => {
-  //       resolve(true);
-  //     }, 1500);
-  //   });
-  // }
+ 
 
   //  SignOut (same as before)
   signOut(): void {
