@@ -1,0 +1,656 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "admin@hotel.com",
+      "password": "admin123",
+      "name": "Hotel Administrator",
+      "role": "admin",
+      "status": "active",
+      "lastLogin": "2025-09-15T12:44:51.232Z",
+      "permissions": [
+        "dashboard",
+        "rooms",
+        "bookings",
+        "guests",
+        "users",
+        "settings",
+        "reports",
+        "system"
+      ],
+      "phone": "9876543210"
+    },
+    {
+      "id": "2",
+      "email": "staff@hotel.com",
+      "password": "staff123",
+      "name": "Hotel Staff Member",
+      "role": "staff",
+      "status": "inactive"
+    },
+    {
+      "id": "3",
+      "email": "guest@hotel.com",
+      "password": "guest123",
+      "name": "Hotel Guest",
+      "role": "guest"
+    },
+    {
+      "id": "4",
+      "email": "bhanup@gmail.com",
+      "name": "Bhanu",
+      "role": "staff",
+      "password": "Bhanu@789"
+    },
+    {
+      "id": "5",
+      "email": "bhanu@gmail.com",
+      "name": "Bhanu Prakash",
+      "role": "staff",
+      "password": "Bhanu@123",
+      "status": "active",
+      "lastLogin": "2025-09-11T12:45:18.250Z",
+      "permissions": [
+        "dashboard",
+        "rooms",
+        "bookings",
+        "guests"
+      ],
+      "phone": "9876543210"
+    },
+    {
+      "id": "6",
+      "email": "Aakash@gmail.com",
+      "name": "Bhanu Prakash",
+      "role": "staff",
+      "password": "Aakash@345"
+    },
+    {
+      "id": "7",
+      "email": "maneesh@gmail.com",
+      "name": "Maneesh",
+      "role": "staff",
+      "password": "Maneesh@345"
+    },
+    {
+      "id": "8",
+      "email": "sathya@gmail.com",
+      "name": "sathya",
+      "role": "staff",
+      "password": "Sathya@123"
+    },
+    {
+      "id": "9",
+      "email": "saketh@gmail.com",
+      "name": "saketh",
+      "role": "staff",
+      "password": "Saketh@123"
+    },
+    {
+      "id": "10",
+      "email": "bhanuprakash@gmail.com",
+      "name": "bhanu",
+      "role": "staff",
+      "password": "Bhanu@678"
+    },
+    {
+      "id": "11",
+      "email": "bhanuprakash291201@gmail.com",
+      "name": "Bhanu",
+      "role": "staff",
+      "password": "Bhanu123@"
+    }
+  ],
+  "rooms": [
+    {
+      "id": "1",
+      "number": "101",
+      "type": "single",
+      "price": 140,
+      "status": "available",
+      "description": "Comfortable single room with city view",
+      "amenities": [
+        "WiFi",
+        "TV",
+        "Air Conditioning",
+        "Mini Bar"
+      ],
+      "floor": 1,
+      "maxOccupancy": 1,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "number": "102",
+      "type": "double",
+      "price": 250,
+      "status": "available",
+      "description": "Spacious double room with garden view",
+      "amenities": [
+        "WiFi",
+        "TV",
+        "Air Conditioning",
+        "Mini Bar",
+        "Balcony"
+      ],
+      "floor": 1,
+      "maxOccupancy": 2,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "number": "201",
+      "type": "suite",
+      "price": 450,
+      "status": "available",
+      "description": "Luxury suite with premium amenities",
+      "amenities": [
+        "WiFi",
+        "TV",
+        "Air Conditioning",
+        "Mini Bar",
+        "Jacuzzi",
+        "Room Service",
+        "Balcony"
+      ],
+      "floor": 2,
+      "maxOccupancy": 4,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "4",
+      "number": "202",
+      "type": "deluxe",
+      "price": 350,
+      "status": "maintenance",
+      "description": "Deluxe room with modern amenities",
+      "amenities": [
+        "WiFi",
+        "TV",
+        "Air Conditioning",
+        "Mini Bar",
+        "Safe",
+        "Coffee Maker"
+      ],
+      "floor": 2,
+      "maxOccupancy": 2,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-14T00:00:00.000Z"
+    },
+    {
+      "id": "b5cf",
+      "number": "103",
+      "type": "deluxe",
+      "price": 450,
+      "status": "available",
+      "description": "luxury room",
+      "amenities": [
+        "WiFi",
+        "TV",
+        "Air Conditioning",
+        "Jacuzzi",
+        "Balcony",
+        "Mini Bar",
+        "Safe"
+      ]
+    }
+  ],
+  "guests": [
+    {
+      "id": "1",
+      "name": "Aakash K B",
+      "email": "Aakash@email.com",
+      "phone": "9784947464",
+      "address": "Kukatpally\n",
+      "idNumber": "ID123456789",
+      "isVip": true,
+      "vipLevel": "gold",
+      "loyaltyPoints": 2500,
+      "dateOfBirth": "1985-06-15",
+      "nationality": "American",
+      "emergencyContact": "+1 234 567 8999",
+      "preferences": [
+        "Non-smoking",
+        "High floor",
+        "City view"
+      ],
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-10T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "name": "Sarah",
+      "email": "sarah@email.com",
+      "phone": "6234568901",
+      "address": "Karimnagar",
+      "idNumber": "ID987654321",
+      "bookings": [],
+      "isVip": true,
+      "loyaltyPoints": 150
+    },
+    {
+      "id": "3",
+      "name": "Bhanu",
+      "email": "bhanu@gamil.com",
+      "phone": "9005078907",
+      "address": "H-No 3/7/342,Vavilalapally,Karimnagar,505001",
+      "idNumber": "65453",
+      "bookings": [],
+      "isVip": false,
+      "loyaltyPoints": 0
+    },
+    {
+      "id": "5",
+      "name": "Jahnavi",
+      "email": "jahnavi@gmail.com",
+      "phone": "8988728434",
+      "address": "Kukatpally",
+      "idNumber": "482834",
+      "bookings": [],
+      "isVip": false,
+      "loyaltyPoints": 0
+    },
+    {
+      "id": "6",
+      "name": "Saketh",
+      "email": "saketh@gmail.com",
+      "phone": "789321456",
+      "address": "Madhapur",
+      "idNumber": "789546",
+      "bookings": [],
+      "isVip": false,
+      "loyaltyPoints": 0
+    },
+    {
+      "id": "7",
+      "name": "Sathya",
+      "email": "sathya@gmail.com",
+      "phone": "8907654321",
+      "address": "Kukatpally",
+      "idNumber": "32452",
+      "bookings": [],
+      "isVip": false,
+      "loyaltyPoints": 0
+    },
+    {
+      "id": "8",
+      "name": "Sanvi",
+      "email": "Sanvi@gmail.com",
+      "phone": "8954987983",
+      "address": "Warangal",
+      "idNumber": "232423",
+      "bookings": [],
+      "isVip": false,
+      "loyaltyPoints": 0
+    },
+    {
+      "id": "9",
+      "name": "Prakash",
+      "email": "Prakash@gmail.com",
+      "phone": "9875236741",
+      "address": "Madhapur Dmart ,Kavuri hills",
+      "idNumber": "278",
+      "bookings": [],
+      "isVip": false,
+      "loyaltyPoints": 0
+    }
+  ],
+  "bookings": [
+    {
+      "id": "1",
+      "guestId": "1",
+      "roomId": "2",
+      "guestName": "John Smith",
+      "roomNumber": "102",
+      "checkIn": "2025-01-15T00:00:00.000Z",
+      "checkOut": "2025-01-18T00:00:00.000Z",
+      "status": "completed",
+      "totalAmount": 750,
+      "numberOfGuests": 2,
+      "specialRequests": "Late check-in requested",
+      "paymentStatus": "paid",
+      "paymentMethod": "credit_card",
+      "createdAt": "2025-01-10T00:00:00.000Z",
+      "updatedAt": "2025-01-12T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "guestId": "2",
+      "roomId": "3",
+      "guestName": "Sarah Johnson",
+      "roomNumber": "201",
+      "checkIn": "2025-01-20T00:00:00.000Z",
+      "checkOut": "2025-01-23T00:00:00.000Z",
+      "status": "completed",
+      "totalAmount": 1350
+    },
+    {
+      "id": "1756901720989",
+      "guestId": "2",
+      "roomId": "3",
+      "status": "completed",
+      "totalAmount": 450,
+      "guestName": "Sarah Johnson",
+      "roomNumber": "201",
+      "checkIn": "2025-09-04T00:00:00.000Z",
+      "checkOut": "2025-09-05T00:00:00.000Z"
+    },
+    {
+      "id": "1756901967811",
+      "guestId": "2",
+      "roomId": "1",
+      "status": "completed",
+      "totalAmount": 140,
+      "guestName": "Sarah Johnson",
+      "roomNumber": "101",
+      "checkIn": "2025-09-04T00:00:00.000Z",
+      "checkOut": "2025-09-05T00:00:00.000Z"
+    },
+    {
+      "id": "1756976658186",
+      "guestId": "1756976599199",
+      "roomId": "1",
+      "status": "completed",
+      "totalAmount": 280,
+      "guestName": "Bhanu",
+      "roomNumber": "101",
+      "checkIn": "2025-09-05T00:00:00.000Z",
+      "checkOut": "2025-09-07T00:00:00.000Z"
+    },
+    {
+      "id": "1756981229126",
+      "guestId": "2",
+      "roomId": "b5cf",
+      "status": "completed",
+      "totalAmount": 2700,
+      "guestName": "Sarah Johnson",
+      "roomNumber": "103",
+      "checkIn": "2025-09-06T00:00:00.000Z",
+      "checkOut": "2025-09-12T00:00:00.000Z"
+    },
+    {
+      "id": "1756987994577",
+      "guestId": "1756987924901",
+      "roomId": "2",
+      "status": "completed",
+      "totalAmount": 2000,
+      "guestName": "Laxmi Priya",
+      "roomNumber": "102",
+      "checkIn": "2025-09-04T00:00:00.000Z",
+      "checkOut": "2025-09-12T00:00:00.000Z"
+    },
+    {
+      "id": "1756988234685",
+      "guestId": "1756987924901",
+      "roomId": "3",
+      "status": "completed",
+      "totalAmount": 4050,
+      "guestName": "Laxmi Priya",
+      "roomNumber": "201",
+      "checkIn": "2025-09-04T00:00:00.000Z",
+      "checkOut": "2025-09-13T00:00:00.000Z"
+    },
+    {
+      "id": "1757053043248",
+      "guestId": "1756976599199",
+      "roomId": "2",
+      "status": "completed",
+      "totalAmount": 1750,
+      "guestName": "Bhanu",
+      "roomNumber": "102",
+      "checkIn": "2025-09-05T00:00:00.000Z",
+      "checkOut": "2025-09-12T00:00:00.000Z",
+      "remainingAmount": 0
+    },
+    {
+      "id": "1757053341690",
+      "guestId": "1756976599199",
+      "roomId": "b5cf",
+      "status": "completed",
+      "totalAmount": 450,
+      "guestName": "Bhanu",
+      "roomNumber": "103",
+      "checkIn": "2025-09-05T00:00:00.000Z",
+      "checkOut": "2025-09-06T00:00:00.000Z"
+    },
+    {
+      "id": "1757061063600",
+      "guestId": "1757061040542",
+      "roomId": "3",
+      "status": "completed",
+      "totalAmount": 3600,
+      "guestName": "Jahnavi",
+      "roomNumber": "201",
+      "checkIn": "2025-09-05T00:00:00.000Z",
+      "checkOut": "2025-09-13T00:00:00.000Z"
+    },
+    {
+      "id": "1757062573579",
+      "guestId": "1",
+      "roomId": "2",
+      "status": "completed",
+      "totalAmount": 1500,
+      "guestName": "Aakash",
+      "roomNumber": "102",
+      "advancePaid": 500,
+      "remainingAmount": 1000,
+      "checkIn": "2025-09-09T00:00:00.000Z",
+      "checkOut": "2025-09-15T00:00:00.000Z"
+    },
+    {
+      "id": "1757336386931",
+      "guestId": null,
+      "roomId": "3",
+      "status": "completed",
+      "totalAmount": 4050,
+      "guestName": "Laxmi Priya",
+      "roomNumber": "201",
+      "advancePaid": 1000,
+      "remainingAmount": 3050,
+      "checkIn": "2025-09-08T00:00:00.000Z",
+      "checkOut": "2025-09-17T00:00:00.000Z"
+    },
+    {
+      "id": "1757337519921",
+      "guestId": "2",
+      "roomId": "1",
+      "status": "completed",
+      "totalAmount": 700,
+      "guestName": "Sarah",
+      "roomNumber": "101",
+      "advancePaid": 0,
+      "remainingAmount": 0,
+      "checkIn": "2025-09-08T00:00:00.000Z",
+      "checkOut": "2025-09-13T00:00:00.000Z"
+    },
+    {
+      "id": "1757571094733",
+      "guestId": "7",
+      "roomId": "1",
+      "status": "completed",
+      "totalAmount": 140,
+      "guestName": "Sathya",
+      "roomNumber": "101",
+      "advancePaid": 40,
+      "remainingAmount": 100,
+      "checkIn": "2025-09-11T00:00:00.000Z",
+      "checkOut": "2025-09-12T00:00:00.000Z"
+    },
+    {
+      "id": "1757572610025",
+      "guestId": "3",
+      "roomId": "1",
+      "status": "completed",
+      "totalAmount": 140,
+      "guestName": "Bhanu",
+      "roomNumber": "101",
+      "advancePaid": 40,
+      "remainingAmount": 100,
+      "checkIn": "2025-09-11T00:00:00.000Z",
+      "checkOut": "2025-09-12T00:00:00.000Z"
+    },
+    {
+      "id": "1757581333088",
+      "guestId": "8",
+      "roomId": "3",
+      "status": "completed",
+      "totalAmount": 900,
+      "guestName": "Sanvi",
+      "roomNumber": "201",
+      "advancePaid": 100,
+      "remainingAmount": 800,
+      "checkIn": "2025-09-11T00:00:00.000Z",
+      "checkOut": "2025-09-13T00:00:00.000Z"
+    },
+    {
+      "id": "1757590032157",
+      "guestId": "5",
+      "roomId": "1",
+      "status": "completed",
+      "totalAmount": 140,
+      "guestName": "Jahnavi",
+      "roomNumber": "101",
+      "advancePaid": 40,
+      "remainingAmount": 100,
+      "checkIn": "2025-09-11T00:00:00.000Z",
+      "checkOut": "2025-09-12T00:00:00.000Z"
+    }
+  ],
+  "UserManagement": [
+    {
+      "id": "1",
+      "name": "John Smith",
+      "email": "john@hotel.com",
+      "role": "admin",
+      "status": "inactive",
+      "lastLogin": "2025-01-10T10:30:00",
+      "permissions": [
+        "dashboard",
+        "rooms",
+        "bookings",
+        "guests",
+        "users",
+        "settings",
+        "reports",
+        "system"
+      ],
+      "password": "Temp@123",
+      "forcePasswordChange": true
+    },
+    {
+      "id": "2",
+      "name": "Sarah Johnson",
+      "email": "sarah@hotel.com",
+      "role": "staff",
+      "status": "active",
+      "lastLogin": "2025-01-09T14:15:00",
+      "permissions": [
+        "dashboard",
+        "rooms",
+        "bookings",
+        "guests"
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Bhanu",
+      "email": "bhanu@gmail.com",
+      "role": "staff",
+      "lastLogin": "2025-01-09T14:15:00",
+      "status": "active",
+      "permissions": [
+        "dashboard",
+        "rooms",
+        "bookings",
+        "guests"
+      ]
+    },
+    {
+      "id": "a3ad41f6-9e8d-48f0-bba8-a1b163e95ae1",
+      "name": "bhanuprakash291201",
+      "email": "bhanuprakash291201@gmail.com",
+      "role": "admin",
+      "status": "active",
+      "lastLogin": "2025-09-16T05:57:12.533Z",
+      "permissions": [
+        "dashboard",
+        "rooms",
+        "bookings",
+        "guests",
+        "users",
+        "settings",
+        "reports",
+        "system"
+      ]
+    }
+  ],
+  "serviceRequests": [
+    {
+      "id": "1",
+      "roomNumber": "101",
+      "type": "housekeeping",
+      "priority": "medium",
+      "description": "Urgent",
+      "status": "completed",
+      "assignedTo": "Bhanu",
+      "requestedAt": "2025-09-12T06:02:30.231Z",
+      "completedAt": "2025-09-12T06:29:42.489Z"
+    },
+    {
+      "id": "2",
+      "roomNumber": "103",
+      "type": "maintenance",
+      "priority": "urgent",
+      "description": "Light is not working",
+      "status": "completed",
+      "assignedTo": "Staff Member",
+      "requestedAt": "2025-09-12T06:07:27.560Z",
+      "completedAt": "2025-09-12T06:20:58.502Z"
+    },
+    {
+      "id": "3",
+      "roomNumber": "201",
+      "type": "room-service",
+      "priority": "high",
+      "description": "Clean the room",
+      "status": "completed",
+      "assignedTo": "Raju",
+      "requestedAt": "2025-09-12T08:57:49.222Z",
+      "completedAt": "2025-09-12T09:13:31.035Z"
+    },
+    {
+      "id": "4",
+      "roomNumber": "102",
+      "type": "room-service",
+      "priority": "urgent",
+      "description": "At 4:00 pm",
+      "status": "completed",
+      "assignedTo": "Pavan",
+      "requestedAt": "2025-09-12T11:31:08.215Z",
+      "completedAt": "2025-09-15T10:54:51.082Z"
+    },
+    {
+      "id": "5",
+      "roomNumber": "103",
+      "type": "laundry",
+      "priority": "high",
+      "description": "Dry cleaning and Ironing.\n",
+      "status": "in-progress",
+      "assignedTo": "Aakash",
+      "requestedAt": "2025-09-12T11:34:05.193Z"
+    },
+    {
+      "id": "6",
+      "roomNumber": "201",
+      "type": "concierge",
+      "priority": "high",
+      "description": "Manage All Things.",
+      "status": "in-progress",
+      "assignedTo": "Priya",
+      "requestedAt": "2025-09-12T11:44:08.482Z"
+    }
+  ]
+}

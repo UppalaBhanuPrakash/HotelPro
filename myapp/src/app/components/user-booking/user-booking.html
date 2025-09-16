@@ -1,0 +1,31 @@
+<div class="rooms-grid">
+  <div class="room-card" *ngFor="let room of availableRooms">
+    <img src="https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500">
+    <h3>{{ room.number }} - {{ room.type }}</h3>
+    <p>Price per night: ₹{{ room.price }}</p>
+    <p>Amenities: {{ room.amenities.join(', ') }}</p>
+    <button (click)="openBookingForm(room)">Book Now</button>
+  </div>
+</div>
+
+<!-- Booking Form Modal -->
+<div class="booking-form" *ngIf="showBookingForm">
+  <h2>Book Room {{ selectedRoom.number }}</h2>
+  <label>Guest Name:
+    <input type="text" [(ngModel)]="guestName" />
+  </label>
+  <label>Government ID:
+    <input type="text" [(ngModel)]="governmentId" />
+  </label>
+  <label>Check-In:
+    <input type="date" [(ngModel)]="checkInDate" (change)="calculateTotal()" />
+  </label>
+  <label>Check-Out:
+    <input type="date" [(ngModel)]="checkOutDate" (change)="calculateTotal()" />
+  </label>
+  <p>Total Cost: ₹{{ totalCost }}</p>
+  <button (click)="payNow()">Pay Now</button>
+  <button (click)="showBookingForm=false">Cancel</button>
+</div>
+
+<p *ngIf="bookingMessage" class="success">{{ bookingMessage }}</p>

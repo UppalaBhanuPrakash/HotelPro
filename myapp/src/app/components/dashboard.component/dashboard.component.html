@@ -1,0 +1,91 @@
+<div class="dashboard">
+      <div class="dashboard-header">
+        <h1>Welcome back, {{ currentUser?.name }}!</h1>
+        <p>Here's what's happening at your hotel today.</p>
+        <div class="user-role-badge">
+          <span class="role-badge" [class]="currentUser?.role">
+            {{ currentUser?.role | titlecase }}
+          </span>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card available">
+          <div class="stat-icon">🏨</div>
+          <div class="stat-content">
+            <h3>{{ availableRooms }}</h3>
+            <p>Available Rooms</p>
+          </div>
+        </div>
+
+        <div class="stat-card occupied">
+          <div class="stat-icon">🛏️</div>
+          <div class="stat-content">
+            <h3>{{ occupiedRooms }}</h3>
+            <p>Occupied Rooms</p>
+          </div>
+        </div>
+
+        <div class="stat-card bookings">
+          <div class="stat-icon">📋</div>
+          <div class="stat-content">
+            <h3>{{ totalBookings }}</h3>
+            <p>Total Bookings</p>
+          </div>
+        </div>
+
+        <div class="stat-card revenue">
+          <div class="stat-icon">💰</div>
+          <div class="stat-content">
+            <h3>${{ totalRevenue | number:'1.0-0' }}</h3>
+            <p>Monthly Revenue</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-content">
+        <div class="recent-bookings">
+          <div class="section-header">
+            <h2>Recent Bookings</h2>
+            <button class="btn-primary" routerLink="/bookings" *ngIf="hasAccess('bookings')">View All</button>
+          </div>
+          <div class="bookings-list">
+            <div class="booking-card" *ngFor="let booking of recentBookings">
+              <div class="booking-info">
+                <h4>{{ booking.guestName }}</h4>
+                <p>Room {{ booking.roomNumber }}</p>
+                <p class="booking-dates">
+                  {{ booking.checkIn | date:'shortDate' }} - {{ booking.checkOut | date:'shortDate' }}
+                </p>
+              </div>
+              <div class="booking-status">
+                <span class="status-badge" [class]="booking.status">
+                  {{ booking.status | titlecase }}
+                </span>
+                <span class="booking-amount">${{ booking.totalAmount }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="room-status">
+          <div class="section-header">
+            <h2>Room Status Overview</h2>
+            <button class="btn-secondary" routerLink="/rooms" *ngIf="hasAccess('rooms')">Manage Rooms</button>
+          </div>
+          <div class="rooms-grid">
+            <div class="room-card" *ngFor="let room of rooms" [class]="room.status">
+              <div class="room-number">{{ room.number }}</div>
+              <div class="room-info">
+                <p class="room-type">{{ room.type | titlecase }}</p>
+                <p class="room-price">${{ room.price }}/night</p>
+              </div>
+              <div class="room-status-indicator">
+                <span class="status-dot" [class]="room.status"></span>
+                <span class="status-text">{{ room.status | titlecase }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

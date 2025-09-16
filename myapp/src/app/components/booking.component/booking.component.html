@@ -1,0 +1,264 @@
+<div class="bookings-container">
+  <div class="bookings-header">
+    <div class="header-content">
+      <h1>Booking Management</h1>
+      <p>Manage reservations and guest bookings</p>
+    </div>
+    <button class="btn-primary" (click)="showAddModal = true">
+      <span class="btn-icon">📋</span>
+      New Booking
+    </button>
+  </div>
+
+  <div class="bookings-stats">
+    <div class="stat-card confirmed">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <h3>{{ confirmedCount }}</h3>
+        <p>Confirmed</p>
+      </div>
+    </div>
+    <div class="stat-card pending">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-content">
+        <h3>{{ pendingCount }}</h3>
+        <p>Pending</p>
+      </div>
+    </div>
+    <div class="stat-card completed">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-content">
+        <h3>{{ completedCount }}</h3>
+        <p>Completed</p>
+      </div>
+    </div>
+    <div class="stat-card total-revenue">
+      <div class="stat-icon">💰</div>
+      <div class="stat-content">
+        <h3>${{ totalRevenue | number:'1.0-0' }}</h3>
+        <p>Total Revenue</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bookings-list">
+    <div class="booking-card" *ngFor="let booking of bookings" [class]="booking.status">
+      <div class="booking-header">
+        <div class="guest-info">
+          <h3>{{ booking.guestName }}</h3>
+          <p>Room {{ booking.roomNumber }}</p>
+        </div>
+        <div class="booking-actions">
+          <button class="action-btn edit" (click)="editBooking(booking)">✏️</button>
+          <button class="action-btn status" (click)="updateBookingStatus(booking)">
+            {{ getNextStatus(booking.status) === 'confirmed' ? '✅' : 
+               getNextStatus(booking.status) === 'completed' ? '🏆' : '❌' }}
+          </button>
+        </div>
+      </div>
+      
+      <div class="booking-content">
+        <div class="booking-dates">
+          <div class="date-item">
+            <span class="date-label">Check-in:</span>
+            <span class="date-value">{{ booking.checkIn | date:'mediumDate' }}</span>
+          </div>
+          <div class="date-item">
+            <span class="date-label">Check-out:</span>
+            <span class="date-value">{{ booking.checkOut | date:'mediumDate' }}</span>
+          </div>
+          <div class="date-item nights">
+            <span class="date-label">Nights:</span>
+            <span class="date-value">{{ calculateNights(booking.checkIn, booking.checkOut) }}</span>
+          </div>
+          
+        </div>
+        
+        <div class="booking-footer">
+          <span class="status-badge" [class]="booking.status">
+            {{ booking.status | titlecase }}
+          </span>
+          <span class="booking-amount">Remaining: ${{ getRemainingAmount(booking) }}</span>
+          <span class="booking-amount">Total: ${{ booking.totalAmount }}</span>
+          <!-- <span class="booking-amount">Remaining: ${{ getRemainingAmount(booking) }}</span> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Booking Modal -->
+  <div class="modal-overlay" *ngIf="showAddModal || showEditModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ showAddModal ? 'New Booking' : 'Edit Booking' }}</h2>
+        <button class="close-btn" (click)="closeModal()">✕</button>
+      </div>
+      
+      <form (ngSubmit)="saveBooking()" #bookingForm="ngForm" class="booking-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="guestId">Guest<span class="required-star">*</span></label>
+            <select
+              id="guestId"
+              name="guestId"
+              [(ngModel)]="currentBooking.guestId"
+              required
+              (change)="onGuestChange()"
+            >
+              <option value="">Select Guest</option>
+              <option *ngFor="let guest of guests" [value]="guest.id">
+                {{ guest.name }} - {{ guest.email }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="roomId">Room<span class="required-star">*</span></label>
+            <select
+              id="roomId"
+              name="roomId"
+              [(ngModel)]="currentBooking.roomId"
+              required
+              (change)="onRoomChange()"
+            >
+              <option value="">Select Room</option>
+              <option *ngFor="let room of availableRooms" [value]="room.id">
+                {{ room.number }} - {{ room.type | titlecase }} (${{ room.price }}/night)
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="checkIn">Check-in Date<span class="required-star">*</span></label>
+            <input
+              type="date"
+              id="checkIn"
+              name="checkIn"
+              [(ngModel)]="checkInDate"
+              required
+              (change)="calculateTotal()"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="checkOut">Check-out Date<span class="required-star">*</span></label>
+            <input
+              type="date"
+              id="checkOut"
+              name="checkOut"
+              [(ngModel)]="checkOutDate"
+              required
+              (change)="calculateTotal()"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="status">Status</label>
+            <select
+              id="status"
+              name="status"
+              [(ngModel)]="currentBooking.status"
+              required
+              (change)="onAdvanceChange()"
+            >
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="totalAmount">Total Amount</label>
+            <input
+              type="number"
+              id="totalAmount"
+              name="totalAmount"
+              [(ngModel)]="currentBooking.totalAmount"
+              required
+              readonly
+              class="readonly"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="advancePaid">Advance Paid</label>
+            <input
+              type="number"
+              id="advancePaid"
+              name="advancePaid"
+              [(ngModel)]="currentBooking.advancePaid"
+              min="0"
+              (input)="onAdvanceChange()"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="remainingAmount">Remaining Amount</label>
+            <input
+              type="number"
+              id="remainingAmount"
+              name="remainingAmount"
+              [(ngModel)]="currentBooking.remainingAmount"
+              readonly
+              class="readonly"
+            >
+          </div>
+        </div>
+
+        <div class="booking-summary" *ngIf="currentBooking.roomId && checkInDate && checkOutDate">
+          <h4>Booking Summary</h4>
+          <div class="summary-item">
+            <span>Guest:</span>
+            <span>{{ getSelectedGuestName() }}</span>
+          </div>
+          <div class="summary-item">
+            <span>Room:</span>
+            <span>{{ getSelectedRoomInfo() }}</span>
+          </div>
+          <div class="summary-item">
+            <span>Duration:</span>
+            <span>{{ displayNights }} nights</span>
+          </div>
+          <div class="summary-item">
+            <span>Room Rate:</span>
+            <span>${{ getRoomPrice() }}/night</span>
+          </div>
+          <div class="summary-item">
+            <span>Room Status After Booking:</span>
+            <span class="status-preview" [class]="getStatusAfterBooking()">
+              {{ getStatusAfterBooking() | titlecase }}
+            </span>
+          </div>
+          <div class="summary-item total">
+            <span>Total Amount:</span>
+            <span>${{ currentBooking.totalAmount }}</span>
+          </div>
+          <div class="summary-item total">
+            <span>Advance Paid:</span>
+            <span>${{ currentBooking.advancePaid || 0 }}</span>
+          </div>
+          <div class="summary-item total">
+            <span>Remaining Amount:</span>
+            <span>${{ currentBooking.status === 'completed' ? 0 : currentBooking.remainingAmount || 0 }}</span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="closeModal()">
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="bookingForm.invalid">
+            {{ showAddModal ? 'Create Booking' : 'Update Booking' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

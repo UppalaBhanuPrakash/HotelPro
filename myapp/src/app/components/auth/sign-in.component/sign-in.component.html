@@ -1,0 +1,89 @@
+<div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-header">
+          <div class="logo">
+            <div class="logo-icon">🏨</div>
+            <h1>Welcome Back</h1>
+          </div>
+          <p>Sign in to your hotel management account</p>
+        </div>
+        
+        <form (ngSubmit)="onSubmit()" #signInForm="ngForm" class="auth-form">
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              [(ngModel)]="credentials.email"
+              required
+              email
+              #emailRef="ngModel"
+              [class.error]="emailRef.invalid && emailRef.touched"
+            >
+            <div class="error-message" *ngIf="emailRef.invalid && emailRef.touched">
+              Please enter a valid email address
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              [(ngModel)]="credentials.password"
+              required
+              minlength="6"
+              #passwordRef="ngModel"
+              [class.error]="passwordRef.invalid && passwordRef.touched"
+            >
+            <div class="error-message" *ngIf="passwordRef.invalid && passwordRef.touched">
+              Password must be at least 6 characters long
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="submit-btn"
+            [disabled]="signInForm.invalid || loading"
+          >
+            <span *ngIf="loading" class="loading-spinner"></span>
+            {{ loading ? 'Signing In...' : 'Sign In' }}
+          </button>
+
+          <div class="error-message" *ngIf="errorMessage">
+            {{ errorMessage }}
+          </div>
+        </form>
+
+        <div class="auth-footer">
+          <p>Don't have an account? <a routerLink="/signup" class="link">Sign up here</a></p>
+          <p><a routerLink="/forgot-password" class="link">Forgot your password?</a></p>
+          <!-- <div class="demo-credentials"> -->
+            <!-- <p><strong>Demo Credentials:</strong></p> -->
+            <!-- <div class="credentials-grid">
+              <div class="credential-item">
+                <strong>Admin:</strong>
+                <span>admin@hotel.com / admin123</span>
+              </div>
+              <div class="credential-item">
+                <strong>Staff:</strong>
+                <span>staff@hotel.com / staff123</span>
+              </div>
+              <div class="credential-item">
+                <strong>Guest:</strong>
+                <span>guest@hotel.com / guest123</span>
+              </div> 
+            </div> -->
+          <!-- </div> -->
+          
+          <!-- <div class="auth-links">
+            <a routerLink="/signup" class="signup-link">
+              <span class="link-icon">✨</span>
+              Create New Account
+            </a>
+          </div> -->
+        </div>
+      </div>
+    </div>

@@ -1,0 +1,257 @@
+<div class="services-container">
+  <!-- Header -->
+  <div class="services-header">
+    <h2>Service Management</h2>
+    <div class="header-actions">
+      <button class="primary-btn" (click)="openNewServiceModal()">🛎️ New Service Request</button>
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <div class="services-stats">
+    <div class="stat-card pending">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-info">
+        <h3>{{ pendingCount }}</h3>
+        <p>Pending Requests</p>
+      </div>
+    </div>
+    <div class="stat-card in-progress">
+      <div class="stat-icon">🔄</div>
+      <div class="stat-info">
+        <h3>{{ inProgressCount }}</h3>
+        <p>In Progress</p>
+      </div>
+    </div>
+    <div class="stat-card completed">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info">
+        <h3>{{ completedCount }}</h3>
+        <p>Completed Today</p>
+      </div>
+    </div>
+    <div class="stat-card urgent">
+      <div class="stat-icon">🚨</div>
+      <div class="stat-info">
+        <h3>{{ urgentCount }}</h3>
+        <p>Urgent Requests</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <select [(ngModel)]="filterType" class="filter-select">
+        <option value="">All Service Types</option>
+        <option value="housekeeping">Housekeeping</option>
+        <option value="maintenance">Maintenance</option>
+        <option value="room-service">Room Service</option>
+        <option value="concierge">Concierge</option>
+        <option value="laundry">Laundry</option>
+      </select>
+
+      <select [(ngModel)]="filterStatus" class="filter-select">
+        <option value="">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="in-progress">In Progress</option>
+        <option value="completed">Completed</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+
+      <select [(ngModel)]="filterPriority" class="filter-select">
+        <option value="">All Priorities</option>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+        <option value="urgent">Urgent</option>
+      </select>
+
+      <button class="filter-btn" (click)="clearFilters()">Clear Filters</button>
+    </div>
+  </div>
+
+  <!-- Service Requests Grid -->
+  <div class="services-grid">
+    <div *ngFor="let request of filteredRequests" class="service-card" [class]="'service-' + request.priority">
+      <div class="service-header">
+        <div class="service-type">
+          <span class="service-icon">{{ getServiceIcon(request.type) }}</span>
+          <div class="type-info">
+            <h3>{{ request.type | titlecase }}</h3>
+            <p class="room-info">Room {{ request.roomNumber }}</p>
+          </div>
+        </div>
+        <div class="priority-badge">
+          <span [class]="'priority-tag priority-' + request.priority">{{ request.priority }}</span>
+        </div>
+      </div>
+
+      <div class="service-description">
+        <p>{{ request.description }}</p>
+      </div>
+
+      <div class="service-details">
+        <div class="detail-row">
+          <div class="detail-item">
+            <span class="detail-label">📅 Requested</span>
+            <span class="detail-value">{{ request.requestedAt | date:'MMM d, h:mm a' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">👤 Assigned To</span>
+            <span class="detail-value">{{ request.assignedTo || 'Unassigned' }}</span>
+          </div>
+        </div>
+
+        <div class="status-row">
+          <div class="detail-item">
+            <span class="detail-label">📊 Status</span>
+            <span [class]="'status-badge status-' + request.status">{{ request.status | titlecase }}</span>
+          </div>
+
+          <div class="detail-item" *ngIf="request.completedAt">
+            <span class="detail-label">✅ Completed</span>
+            <span class="detail-value">{{ request.completedAt | date:'MMM d, h:mm a' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="service-actions">
+        <button *ngIf="request.status !== 'completed'" class="action-btn edit-btn" (click)="editService(request)">✏️ Edit</button>
+        <button *ngIf="request.status === 'pending'" (click)="startService(request.id)" class="action-btn start-btn">▶️ Start</button>
+        <button *ngIf="request.status === 'in-progress'" (click)="completeService(request.id)" class="action-btn complete-btn">✅ Complete</button>
+        <button class="action-btn details-btn" (click)="viewServiceDetails(request)">📋 Details</button>
+        <button *ngIf="request.status === 'pending'" class="action-btn cancel-btn" (click)="cancelService(request.id)">❌ Cancel</button>
+      </div>
+
+      <div class="service-timeline">
+        <div class="timeline-item active">
+          <span class="timeline-dot"></span>
+          <span class="timeline-label">Requested</span>
+        </div>
+        <div class="timeline-item" [class.active]="request.status !== 'pending'">
+          <span class="timeline-dot"></span>
+          <span class="timeline-label">In Progress</span>
+        </div>
+        <div class="timeline-item" [class.active]="request.status === 'completed'">
+          <span class="timeline-dot"></span>
+          <span class="timeline-label">Completed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Service Request Modal -->
+  <div *ngIf="showNewServiceModal" class="modal-overlay" (click)="closeNewServiceModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>🛎️ New Service Request</h3>
+        <button class="close-btn" (click)="closeNewServiceModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="submitServiceRequest()" #serviceForm="ngForm">
+          <div class="form-group">
+            <label for="roomNumber">Room Number *</label>
+            <input type="text" id="roomNumber" [(ngModel)]="newServiceRequest.roomNumber" name="roomNumber" class="form-input" placeholder="e.g., 101" required>
+          </div>
+          <div class="form-group">
+            <label for="serviceType">Service Type *</label>
+            <select id="serviceType" [(ngModel)]="newServiceRequest.type" name="serviceType" class="form-select" required>
+              <option value="">Select service type</option>
+              <option value="housekeeping">🧹 Housekeeping</option>
+              <option value="maintenance">🔧 Maintenance</option>
+              <option value="room-service">🍽️ Room Service</option>
+              <option value="concierge">🛎️ Concierge</option>
+              <option value="laundry">👔 Laundry</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="priority">Priority *</label>
+            <select id="priority" [(ngModel)]="newServiceRequest.priority" name="priority" class="form-select" required>
+              <option value="">Select priority</option>
+              <option value="low">🟢 Low</option>
+              <option value="medium">🟡 Medium</option>
+              <option value="high">🟠 High</option>
+              <option value="urgent">🔴 Urgent</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="assignedTo">Assign To</label>
+            <input type="text" id="assignedTo" [(ngModel)]="newServiceRequest.assignedTo" name="assignedTo" class="form-input" placeholder="Staff member name">
+          </div>
+          <div class="form-group">
+            <label for="description">Description *</label>
+            <textarea id="description" [(ngModel)]="newServiceRequest.description" name="description" class="form-textarea" placeholder="Detailed description..." rows="4" required></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" (click)="closeNewServiceModal()">Cancel</button>
+            <button type="submit" class="submit-btn" [disabled]="!serviceForm.form.valid">Create Request</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Service Details Modal -->
+  <div *ngIf="selectedService" class="modal-overlay" (click)="closeServiceDetails()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ getServiceIcon(selectedService.type) }} {{ selectedService.type | titlecase }} Details</h3>
+        <button class="close-btn" (click)="closeServiceDetails()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="service-detail-grid">
+          <div class="detail-section">
+            <h4>📋 Request Information</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <label>Room:</label>
+                <span>{{ selectedService.roomNumber }}</span>
+              </div>
+              <div class="info-item">
+                <label>Service Type:</label>
+                <span>{{ selectedService.type | titlecase }}</span>
+              </div>
+              <div class="info-item">
+                <label>Priority:</label>
+                <span [class]="'priority-tag priority-' + selectedService.priority">{{ selectedService.priority }}</span>
+              </div>
+              <div class="info-item">
+                <label>Status:</label>
+                <span [class]="'status-badge status-' + selectedService.status">{{ selectedService.status | titlecase }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4>⏱️ Timeline</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <label>Requested:</label>
+                <span>{{ selectedService.requestedAt | date:'MMM d, y h:mm a' }}</span>
+              </div>
+              <div class="info-item" *ngIf="selectedService.assignedTo">
+                <label>Assigned To:</label>
+                <span>{{ selectedService.assignedTo }}</span>
+              </div>
+              <div class="info-item" *ngIf="selectedService.completedAt">
+                <label>Completed:</label>
+                <span>{{ selectedService.completedAt | date:'MMM d, y h:mm a' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="description-section">
+          <h4>📝 Description</h4>
+          <p class="description-text">{{ selectedService.description }}</p>
+        </div>
+
+        <div class="status-actions">
+          <button *ngIf="selectedService.status === 'pending'" (click)="startService(selectedService.id); closeServiceDetails()" class="status-action-btn start-btn">Start Service</button>
+          <button *ngIf="selectedService.status === 'in-progress'" (click)="completeService(selectedService.id); closeServiceDetails()" class="status-action-btn complete-btn">Complete Service</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

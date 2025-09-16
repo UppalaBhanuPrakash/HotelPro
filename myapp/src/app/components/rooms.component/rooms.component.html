@@ -1,0 +1,181 @@
+<div class="rooms-container">
+      <div class="rooms-header">
+        <div class="header-content">
+          <h1>Room Management</h1>
+          <p>Manage your hotel rooms, pricing, and availability</p>
+        </div>
+        <button class="btn-primary" (click)="showAddModal = true">
+          <span class="btn-icon">➕</span>
+          Add New Room
+        </button>
+      </div>
+
+      <div class="rooms-stats">
+        <div class="stat-card available">
+          <div class="stat-icon">🟢</div>
+          <div class="stat-content">
+            <h3>{{ availableCount }}</h3>
+            <p>Available</p>
+          </div>
+        </div>
+        <div class="stat-card occupied">
+          <div class="stat-icon">🔴</div>
+          <div class="stat-content">
+            <h3>{{ occupiedCount }}</h3>
+            <p>Occupied</p>
+          </div>
+        </div>
+        <div class="stat-card maintenance">
+          <div class="stat-icon">🔧</div>
+          <div class="stat-content">
+            <h3>{{ maintenanceCount }}</h3>
+            <p>Maintenance</p>
+          </div>
+        </div>
+        <div class="stat-card reserved">
+          <div class="stat-icon">🟡</div>
+          <div class="stat-content">
+            <h3>{{ reservedCount }}</h3>
+            <p>Reserved</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rooms-grid">
+        <div class="room-card" *ngFor="let room of rooms" [class]="room.status">
+          <div class="room-header">
+            <div class="room-number">{{ room.number }}</div>
+            <div class="room-actions">
+              <button class="action-btn edit" (click)="editRoom(room)">✏️</button>
+              <button class="action-btn delete" (click)="deleteRoom(room.id)">🗑️</button>
+            </div>
+          </div>
+          
+          <div class="room-content">
+            <div class="room-type">{{ room.type | titlecase }}</div>
+            <div class="room-price">${{ room.price }}/night</div>
+            <div class="room-description">{{ room.description }}</div>
+            
+            <div class="room-amenities">
+              <span class="amenity" *ngFor="let amenity of room.amenities">
+                {{ amenity }}
+              </span>
+            </div>
+            
+            <div class="room-status">
+              <span class="status-badge" [class]="room.status">
+                {{ room.status | titlecase }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add/Edit Room Modal -->
+      <div class="modal-overlay" *ngIf="showAddModal || showEditModal" (click)="closeModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>{{ showAddModal ? 'Add New Room' : 'Edit Room' }}</h2>
+            <button class="close-btn" (click)="closeModal()">✕</button>
+          </div>
+          
+          <form (ngSubmit)="saveRoom()" #roomForm="ngForm" class="room-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="roomNumber" required>Room Number<span class="required-star">*</span></label>
+                <input
+                  type="text"
+                  id="roomNumber"
+                  name="roomNumber"
+                  [(ngModel)]="currentRoom.number"
+                  required
+                  #roomNumberRef="ngModel"
+                >
+              </div>
+              <!-- <div class="error" *ngIf="roomNumberRef.invalid && roomNumberRef.touched">
+  Room number is required.
+</div> -->
+              <div class="form-group">
+                <label for="roomType">Room Type</label>
+                <select
+                  id="roomType"
+                  name="roomType"
+                  [(ngModel)]="currentRoom.type"
+                  required
+                >
+                  <option value="single">Single</option>
+                  <option value="double">Double</option>
+                  <option value="suite">Suite</option>
+                  <option value="deluxe">Deluxe</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="roomPrice">Price per Night</label>
+                <input
+                  type="number"
+                  id="roomPrice"
+                  name="roomPrice"
+                  [(ngModel)]="currentRoom.price"
+                  required
+                  min="0"
+                >
+              </div>
+              
+              <div class="form-group">
+                <label for="roomStatus">Status</label>
+                <select
+                  id="roomStatus"
+                  name="roomStatus"
+                  [(ngModel)]="currentRoom.status"
+                  required
+                >
+                  <option value="available">Available</option>
+                  <option value="occupied">Occupied</option>
+                  <option value="maintenance">Maintenance</option>
+                  <option value="reserved">Reserved</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="roomDescription">Description<span class="required-star">*</span></label>
+              <textarea
+                id="roomDescription"
+                name="roomDescription"
+                [(ngModel)]="currentRoom.description"
+                rows="3"
+                required
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Amenities</label>
+              <div class="amenities-grid">
+                <label class="checkbox-label" *ngFor="let amenity of availableAmenities">
+                  <input
+                    type="checkbox"
+                    [checked]="(currentRoom.amenities || []).includes(amenity)"
+                    (change)="toggleAmenity(amenity)"
+                  >
+                  <span class="checkmark"></span>
+                  {{ amenity }}
+                </label>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" (click)="closeModal()">
+                Cancel
+              </button>
+              <button type="submit" class="btn-primary" [disabled]="roomForm.invalid">
+                {{ showAddModal ? 'Add Room' : 'Update Room' }}
+               
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>

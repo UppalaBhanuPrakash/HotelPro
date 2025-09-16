@@ -1,0 +1,103 @@
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="logo">
+                <div class="logo-icon">🏨</div>
+                <h1>Create Account</h1>
+            </div>
+            <p>Join our hotel management system</p>
+        </div>
+
+        <form (ngSubmit)="onSubmit()" #signUpForm="ngForm" class="auth-form">
+            <div class="form-group">
+                <label for="name">Full Name<span class="required-star">*</span></label>
+                <input type="text" id="name" name="name" [(ngModel)]="userData.name" required minlength="2"
+                    #nameRef="ngModel" [class.error]="nameRef.invalid && nameRef.touched"
+                    placeholder="Enter your full name">
+                <div class="error-message" *ngIf="nameRef.invalid && nameRef.touched">
+                    <span *ngIf="nameRef.errors?.['required']">Name is required</span>
+                    <div *ngIf="isNameInvalid && userData.name.length > 0" class="error">
+                        Name must have at least 3 characters and contain only letters.
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address<span class="required-star">*</span></label>
+                <input type="email" id="email" name="email" [(ngModel)]="userData.email" required email
+                    #emailRef="ngModel" [class.error]="emailRef.invalid && emailRef.touched"
+                    placeholder="Enter your email address">
+                <div class="error-message" *ngIf="emailRef.invalid && emailRef.touched">
+
+                    <div *ngIf="isEmailInvalid && userData.email.length > 0" class="error">
+                        Please enter a valid email address (must include @ and .).
+                    </div>
+                    <span *ngIf="emailRef.errors?.['email']">Please enter a valid email address</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password<span class="required-star">*</span></label>
+                <input type="password" id="password" name="password" [(ngModel)]="userData.password" required
+                    minlength="6" #passwordRef="ngModel" [class.error]="passwordRef.invalid && passwordRef.touched"
+                    placeholder="Create a strong password">
+                <div class="error-message" *ngIf="passwordRef.invalid && passwordRef.touched">
+                    <span *ngIf="passwordRef.errors?.['required']">Password is required</span>
+                    <div *ngIf="isPasswordInvalid && userData.password.length > 0" class="error">
+                        Password must be at least 6 characters, include one uppercase and one special character.
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password<span class="required-star">*</span></label>
+                <input type="password" id="confirmPassword" name="confirmPassword"
+                    [(ngModel)]="userData.confirmPassword" required #confirmPasswordRef="ngModel"
+                    [class.error]="confirmPasswordRef.invalid && confirmPasswordRef.touched || passwordMismatch"
+                    placeholder="Confirm your password">
+                <div class="error-message" *ngIf="passwordMismatch && userData.confirmPassword.length > 0">
+                    Passwords do not match
+                </div>
+            </div>
+
+            <!-- <div class="form-group">
+            <label for="role">Role</label>
+            <select
+              id="role"
+              name="role"
+              [(ngModel)]="userData.role"
+              required
+              #roleRef="ngModel"
+              [class.error]="roleRef.invalid && roleRef.touched"
+            >
+              <option value="">Select your role</option>
+              <option value="admin">Administrator</option>
+              <option value="staff">Staff Member</option>
+              <option value="guest">Guest</option>
+            </select>
+            <div class="error-message" *ngIf="roleRef.invalid && roleRef.touched">
+              Please select a role
+            </div>
+          </div> -->
+
+            <button type="submit" class="submit-btn" [disabled]="signUpForm.invalid || loading || passwordMismatch">
+                <span *ngIf="loading" class="loading-spinner"></span>
+                <span class="btn-icon" *ngIf="!loading">✨</span>
+                {{ loading ? 'Creating Account...' : 'Create Account' }}
+            </button>
+
+            <div class="error-message" *ngIf="errorMessage">
+                {{ errorMessage }}
+            </div>
+
+            <div class="success-message" *ngIf="successMessage">
+                {{ successMessage }}
+            </div>
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a routerLink="/signin" class="link">Sign in here</a></p>
+            <p><a routerLink="/forgot-password" class="link">Forgot your password?</a></p>
+        </div>
+    </div>
+</div>

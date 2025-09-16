@@ -1,0 +1,250 @@
+ <div class="guests-container">
+      <div class="guests-header">
+        <div class="header-content">
+          <h1>Guest Management</h1>
+          <p>Manage guest information and booking history</p>
+        </div>
+        <button class="btn-primary" (click)="showAddModal = true">
+          <span class="btn-icon">👤</span>
+          Add New Guest
+        </button>
+      </div>
+
+      <div class="guests-stats">
+        <div class="stat-card total">
+          <div class="stat-icon">👥</div>
+          <div class="stat-content">
+            <h3>{{ guests.length }}</h3>
+            <p>Total Guests</p>
+          </div>
+        </div>
+        <div class="stat-card active">
+          <div class="stat-icon">🏨</div>
+          <div class="stat-content">
+            <h3>{{ activeGuestsCount }}</h3>
+            <p>Active Bookings</p>
+          </div>
+        </div>
+        <div class="stat-card vip">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-content">
+            <h3>{{ vipGuestsCount }}</h3>
+            <p>VIP Guests</p>
+          </div>
+        </div>
+        <div class="stat-card revenue">
+          <div class="stat-icon">💎</div>
+          <div class="stat-content">
+            <h3>${{ averageSpending | number:'1.0-0' }}</h3>
+            <p>Avg. Spending</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="search-bar">
+        <div class="search-input-container">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            placeholder="Search guests by name, email, or phone..."
+            [(ngModel)]="searchTerm"
+            (input)="filterGuests()"
+            class="search-input"
+          >
+        </div>
+      </div>
+
+      <div class="guests-grid">
+        <div class="guest-card" *ngFor="let guest of filteredGuests">
+          <div class="guest-header">
+            <div class="guest-avatar">
+              {{ getGuestInitials(guest.name) }}
+            </div>
+            <div class="guest-info">
+              <h3>{{ guest.name }}</h3>
+              <p class="guest-email">{{ guest.email }}</p>
+              <p class="guest-phone">{{ guest.phone }}</p>
+            </div>
+            <div class="guest-actions">
+              <button class="action-btn edit" (click)="editGuest(guest)" title="Edit Guest">
+                ✏️
+              </button>
+              <button class="action-btn view" (click)="viewGuestDetails(guest)" title="View Details">
+                👁️
+              </button>
+              <button class="action-btn delete" (click)="deleteGuest(guest.id)" title="Delete Guest">
+                🗑️
+              </button>
+            </div>
+          </div>
+          
+          <div class="guest-content">
+            <div class="guest-details">
+              <div class="detail-item">
+                <span class="detail-label">ID Number:</span>
+                <span class="detail-value">{{ guest.idNumber }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Address:</span>
+                <span class="detail-value">{{ guest.address }}</span>
+              </div>
+            </div>
+            
+            <div class="guest-stats">
+              <div class="guest-stat">
+                <span class="stat-number">{{ getGuestBookings(guest.id).length }}</span>
+                <span class="stat-label">Bookings</span>
+              </div>
+              <div class="guest-stat">
+                <span class="stat-number">${{ getGuestTotalSpent(guest.id) }}</span>
+                <span class="stat-label">Total Spent</span>
+              </div>
+              <div class="guest-stat">
+                <span class="stat-number">{{ getGuestStatus(guest.id) }}</span>
+                <span class="stat-label">Status</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add/Edit Guest Modal -->
+      <div class="modal-overlay" *ngIf="showAddModal || showEditModal" (click)="closeModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>{{ showAddModal ? 'Add New Guest' : 'Edit Guest' }}</h2>
+            <button class="close-btn" (click)="closeModal()">✕</button>
+          </div>
+          
+          <form (ngSubmit)="saveGuest()" #guestForm="ngForm" class="guest-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="guestName">Full Name <span class="required-star">*</span></label>
+                <input
+                  type="text"
+                  id="guestName"
+                  name="guestName"
+                  [(ngModel)]="currentGuest.name"
+                  required
+                  minlength="2"
+                >
+              </div>
+              
+              <div class="form-group">
+                <label for="guestEmail">Email Address <span class="required-star">*</span></label>
+                <input
+                  type="email"
+                  id="guestEmail"
+                  name="guestEmail"
+                  [(ngModel)]="currentGuest.email"
+                  required
+                  email
+                >
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="guestPhone">Phone Number <span class="required-star">*</span></label>
+                <input
+                  type="tel"
+                  id="guestPhone"
+                  name="guestPhone"
+                  [(ngModel)]="currentGuest.phone"
+                  required
+                  minlength="10"
+                  maxlength="10"                
+                  pattern="[0-9]{10}"
+                >
+              </div>
+              
+              <div class="form-group">
+                <label for="guestIdNumber">ID Number <span class="required-star">*</span></label>
+                <input
+                  type="text"
+                  id="guestIdNumber"
+                  name="guestIdNumber"
+                  [(ngModel)]="currentGuest.idNumber"
+                  required
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="guestAddress">Address <span class="required-star">*</span></label>
+              <textarea
+                id="guestAddress"
+                name="guestAddress"
+                [(ngModel)]="currentGuest.address"
+                rows="3"
+                required
+              ></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" (click)="closeModal()">
+                Cancel
+              </button>
+              <button type="submit" class="btn-primary" [disabled]="guestForm.invalid">
+                {{ showAddModal ? 'Add Guest' : 'Update Guest' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Guest Details Modal -->
+      <div class="modal-overlay" *ngIf="showDetailsModal" (click)="closeDetailsModal()">
+        <div class="modal-content large" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Guest Details - {{ selectedGuest?.name }}</h2>
+            <button class="close-btn" (click)="closeDetailsModal()">✕</button>
+          </div>
+          
+          <div class="guest-details-content" *ngIf="selectedGuest">
+            <div class="details-grid">
+              <div class="guest-profile">
+                <div class="profile-avatar">
+                  {{ getGuestInitials(selectedGuest.name) }}
+                </div>
+                <div class="profile-info">
+                  <h3>{{ selectedGuest.name }}</h3>
+                  <p>{{ selectedGuest.email }}</p>
+                  <p>{{ selectedGuest.phone }}</p>
+                  <p>ID: {{ selectedGuest.idNumber }}</p>
+                  <div class="profile-address">
+                    <strong>Address:</strong><br>
+                    {{ selectedGuest.address }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="booking-history">
+                <h4>Booking History</h4>
+                <div class="booking-list" *ngIf="getGuestBookings(selectedGuest.id).length > 0; else noBookings">
+                  <div class="booking-item" *ngFor="let booking of getGuestBookings(selectedGuest.id)">
+                    <div class="booking-info">
+                      <div class="booking-room">Room {{ booking.roomNumber }}</div>
+                      <div class="booking-dates">
+                        {{ booking.checkIn | date:'mediumDate' }} - {{ booking.checkOut | date:'mediumDate' }}
+                      </div>
+                    </div>
+                    <div class="booking-meta">
+                      <span class="booking-status" [class]="booking.status">
+                        {{ booking.status | titlecase }}
+                      </span>
+                      <span class="booking-amount">${{ booking.totalAmount }}</span>
+                    </div>
+                  </div>
+                </div>
+                <ng-template #noBookings>
+                  <div class="no-bookings">
+                    <p>No booking history available</p>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
