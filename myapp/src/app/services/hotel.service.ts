@@ -224,7 +224,7 @@ deleteGuest(id: string): void {
 
 private userManagementUrl = `${this.baseUrl}/UserManagement`;
 
-// ----------------- USER MANAGEMENT CRUD -----------------
+
 
 // Fetch all UserManagement users
 getUserManagement(): Observable<AppUser[]> {
