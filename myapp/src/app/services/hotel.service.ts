@@ -85,18 +85,12 @@ getRooms(): Observable<Room[]> {
     });
   }
 
-  // bookings$ = this.bookingsSubject.asObservable();
-
-  //  This method MUST exist
 updateBooking(id: string, booking: Partial<Booking>): void {
   this.http.patch<Booking>(`${this.baseUrl}/bookings/${id}`, booking).subscribe(() => {
-    // Update local bookings
     const updatedBookings = this.bookingsSubject.value.map(b =>
       b.id === id ? { ...b, ...booking } : b
     );
     this.bookingsSubject.next(updatedBookings);
-
-    // Update room status if booking status changed
     if (booking.status && updatedBookings.find(b => b.id === id)) {
       let roomStatus: Room['status'];
       switch (booking.status) {
@@ -121,11 +115,20 @@ updateBooking(id: string, booking: Partial<Booking>): void {
 }
 
   addBooking(booking: Omit<Booking, 'id'>): void {
-  const newBooking: Booking = { ...booking, id: Date.now().toString() };
+  // Get current bookings
+  const currentBookings = this.bookingsSubject.value;
+
+  // Convert existing ids to numbers, find max
+  const maxId = currentBookings.length
+    ? Math.max(...currentBookings.map(b => Number(b.id) || 0))
+    : 0;
+
+  // Assign new id as max + 1
+  const newBooking: Booking = { ...booking, id: (maxId + 1).toString() };
 
   this.http.post<Booking>(`${this.baseUrl}/bookings`, newBooking).subscribe(added => {
-    // Update the bookingsSubject
-    this.bookingsSubject.next([...this.bookingsSubject.value, {
+    // Update local bookings
+    this.bookingsSubject.next([...currentBookings, {
       ...added,
       checkIn: new Date(added.checkIn),
       checkOut: new Date(added.checkOut)
@@ -136,14 +139,25 @@ updateBooking(id: string, booking: Partial<Booking>): void {
     if (added.status === 'confirmed') roomStatus = 'occupied';
     else if (added.status === 'pending') roomStatus = 'reserved';
 
-    // Update the room status in backend
+    // Update room in backend + local cache
     this.updateRoom(added.roomId, { status: roomStatus }).subscribe(updatedRoom => {
-      // Also update local roomsSubject so UI reflects the change
       const updatedRooms = this.roomsSubject.value.map(r =>
         r.id === updatedRoom.id ? updatedRoom : r
       );
       this.roomsSubject.next(updatedRooms);
     });
+  });
+}
+uploadGovernmentId(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  return new Promise((resolve, reject) => {
+    this.http.post<{ filePath: string }>('http://localhost:3000/upload', formData)
+      .subscribe({
+        next: (res) => resolve(res.filePath), // return path like "/uploads/abc.pdf"
+        error: (err) => reject(err)
+      });
   });
 }
   private updateRoomStatusFromBooking(roomId: string, bookingStatus: string): void {
@@ -161,7 +175,7 @@ updateBooking(id: string, booking: Partial<Booking>): void {
         roomStatus = 'available';
         break;
       default:
-        return; // Don't update room status for unknown booking status
+        return;
     }
     
     this.updateRoom(roomId, { status: roomStatus });

@@ -199,13 +199,14 @@ editService(service: ServiceRequest) {
 
   //  Icons
   getServiceIcon(type: string): string {
-    const icons: { [key: string]: string } = {
-      'housekeeping': '🧹',
-      'maintenance': '🔧',
-      'room-service': '🍽️',
-      'concierge': '🛎️',
-      'laundry': '👔'
-    };
-    return icons[type] || '📋';
-  }
+  const icons: { [key: string]: string } = {
+    'housekeeping': '<i class="bi bi-house fs-4"></i',
+    'maintenance': '<i class="bi bi-tools fs-4"></i>',
+    'room-service': '<i class="bi bi-cup-hot fs-4"></i>',
+    'concierge': '<i class="bi bi-bell fs-4"></i>',
+    'laundry': '<i class="bi bi-person fs-4"></i>'
+  };
+  return icons[type] || '<i class="bi bi-clipboard fs-4"></i>';
+}
+
 }

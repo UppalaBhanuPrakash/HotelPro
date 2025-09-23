@@ -13,24 +13,25 @@ import { AuthGuard } from './guards/auth.guard';
 import { ServicesComponent } from './components/service/service';
 import { ChangePasswordComponent } from './components/auth/change-password.component/change-password.component';
 import { UserBookingComponent } from './components/user-booking/user-booking';
+import { RoleGuard } from './guards/Role.guard';
 export const routes: Routes = [
-  { path: '', redirectTo: '/signin', pathMatch: 'full' },
+   { path: '', redirectTo: '/signin', pathMatch: 'full' },
   { path: 'signin', component: SignInComponent },
   { path: 'signup', component: SignUpComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
-   { path: 'change-password', component: ChangePasswordComponent },
+  { path: 'change-password', component: ChangePasswordComponent },
   {
     path: '',
     component: MainLayoutComponent,
     canActivate: [AuthGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent },
-      { path: 'rooms', component: RoomsComponent },
-       { path: 'bookings', component: BookingsComponent },
-      { path: 'guests', component: GuestsComponent },
-      { path: 'settings', component: SettingsComponent },
-      {path:'service',component:ServicesComponent},
-      {path:'userBooking',component:UserBookingComponent}
+      { path: 'rooms', component: RoomsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'staff'] } },
+      { path: 'bookings', component: BookingsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'staff'] } },
+      { path: 'guests', component: GuestsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'staff'] } },
+      { path: 'settings', component: SettingsComponent, canActivate: [RoleGuard], data: { roles: ['admin','staff','guest'] } },
+      { path: 'service', component: ServicesComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'staff'] } },
+      { path: 'userBooking', component: UserBookingComponent, data: { roles: ['guest', 'admin', 'staff'] } }
     ]
   },
   { path: '**', redirectTo: '/signin' }

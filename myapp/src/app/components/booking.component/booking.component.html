@@ -1,262 +1,190 @@
-<div class="bookings-container">
-  <div class="bookings-header">
-    <div class="header-content">
-      <h1>Booking Management</h1>
-      <p>Manage reservations and guest bookings</p>
+<div class="container-fluid py-4 bg-light min-vh-100">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+      <h1 class="h3 text-primary fw-bold mb-1" style=" font-size: 2.5rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 8px;">Booking Management</h1>
+      <p class="text-muted mb-0">Manage reservations and guest bookings</p>
     </div>
-    <button class="btn-primary" (click)="showAddModal = true">
-      <span class="btn-icon">📋</span>
-      New Booking
+    <button class="btn btn-primary" (click)="showAddModal = true">
+      📋 New Booking
     </button>
   </div>
+  <div class="position-fixed top-0 end-0 p-3" style="z-index: 1055">
+  <div class="toast align-items-center text-white bg-success border-0" 
+       role="alert" 
+       aria-live="assertive" 
+       aria-atomic="true"
+       #bookingToast>
+    <div class="d-flex">
+      <div class="toast-body">
+        Booking completed successfully!
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" 
+              data-bs-dismiss="toast" 
+              aria-label="Close"></button>
+    </div>
+  </div>
+</div>
 
-  <div class="bookings-stats">
-    <div class="stat-card confirmed">
-      <div class="stat-icon">✅</div>
-      <div class="stat-content">
-        <h3>{{ confirmedCount }}</h3>
-        <p>Confirmed</p>
+  <div class="row g-4 mb-4">
+    <div class="col-md-3">
+      <div class="card stat-card pending p-3">
+        <h3 class="fw-bold mb-1">{{ pendingCount }}</h3>
+        <p class="mb-0">Pending</p>
       </div>
     </div>
-    <div class="stat-card pending">
-      <div class="stat-icon">⏳</div>
-      <div class="stat-content">
-        <h3>{{ pendingCount }}</h3>
-        <p>Pending</p>
+
+    <div class="col-md-3">
+      <div class="card stat-card confirmed p-3">
+        <h3 class="fw-bold mb-1">{{ confirmedCount }}</h3>
+        <p class="mb-0">Confirmed</p>
       </div>
     </div>
-    <div class="stat-card completed">
-      <div class="stat-icon">🏆</div>
-      <div class="stat-content">
-        <h3>{{ completedCount }}</h3>
-        <p>Completed</p>
+
+    <div class="col-md-3">
+      <div class="card stat-card completed p-3">
+        <h3 class="fw-bold mb-1">{{ completedCount }}</h3>
+        <p class="mb-0">Completed</p>
       </div>
     </div>
-    <div class="stat-card total-revenue">
-      <div class="stat-icon">💰</div>
-      <div class="stat-content">
-        <h3>${{ totalRevenue | number:'1.0-0' }}</h3>
-        <p>Total Revenue</p>
+
+    <div class="col-md-3">
+      <div class="card stat-card total-revenue p-3">
+        <h3 class="fw-bold mb-1">₹{{ totalRevenue }}</h3>
+        <p class="mb-0">Total Revenue</p>
       </div>
     </div>
   </div>
 
-  <div class="bookings-list">
-    <div class="booking-card" *ngFor="let booking of bookings" [class]="booking.status">
-      <div class="booking-header">
-        <div class="guest-info">
-          <h3>{{ booking.guestName }}</h3>
-          <p>Room {{ booking.roomNumber }}</p>
-        </div>
-        <div class="booking-actions">
-          <button class="action-btn edit" (click)="editBooking(booking)">✏️</button>
-          <button class="action-btn status" (click)="updateBookingStatus(booking)">
-            {{ getNextStatus(booking.status) === 'confirmed' ? '✅' : 
-               getNextStatus(booking.status) === 'completed' ? '🏆' : '❌' }}
-          </button>
-        </div>
-      </div>
-      
-      <div class="booking-content">
-        <div class="booking-dates">
-          <div class="date-item">
-            <span class="date-label">Check-in:</span>
-            <span class="date-value">{{ booking.checkIn | date:'mediumDate' }}</span>
+  <div class="row g-4">
+    <div class="col-12" *ngFor="let booking of bookings">
+      <div class="card booking-card p-3" [ngClass]="booking.status">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <h5 class="fw-bold mb-1">{{ booking.guestName }}</h5>
+            <p class="mb-0 text-muted">Room {{ booking.roomNumber }}</p>
           </div>
-          <div class="date-item">
-            <span class="date-label">Check-out:</span>
-            <span class="date-value">{{ booking.checkOut | date:'mediumDate' }}</span>
+          <div class="d-flex gap-2">
+            <button class="action-btn edit border-0" (click)="editBooking(booking)">
+              ✏️
+            </button>
+            <button class="action-btn status border-0" (click)="updateBookingStatus(booking)">
+              🔄
+            </button>
           </div>
-          <div class="date-item nights">
-            <span class="date-label">Nights:</span>
-            <span class="date-value">{{ calculateNights(booking.checkIn, booking.checkOut) }}</span>
-          </div>
-          
         </div>
-        
-        <div class="booking-footer">
-          <span class="status-badge" [class]="booking.status">
-            {{ booking.status | titlecase }}
+
+        <div class="d-flex justify-content-between mb-2">
+          <div>
+            <small class="text-muted">CHECK-IN:</small>
+            <p class="mb-0">{{ booking.checkIn | date:'MMM d, yyyy' }}</p>
+          </div>
+          <div>
+            <small class="text-muted">CHECK-OUT:</small>
+            <p class="mb-0">{{ booking.checkOut | date:'MMM d, yyyy' }}</p>
+          </div>
+          <div>
+            <small class="text-muted">NIGHTS:</small>
+            <p class="mb-0">{{ calculateNights(booking.checkIn, booking.checkOut) }}</p>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <span class="badge status-badge" [ngClass]="booking.status">
+            {{ booking.status.toUpperCase() }}
           </span>
-          <span class="booking-amount">Remaining: ${{ getRemainingAmount(booking) }}</span>
-          <span class="booking-amount">Total: ${{ booking.totalAmount }}</span>
-          <!-- <span class="booking-amount">Remaining: ${{ getRemainingAmount(booking) }}</span> -->
+          <div class="text-end">
+            <p class="mb-0 text-success fw-bold">
+              Remaining: ${{ getRemainingAmount(booking) }}
+            </p>
+            <p class="mb-0 text-success fw-bold">
+              Total: ${{ booking.totalAmount }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Add/Edit Booking Modal -->
-  <div class="modal-overlay" *ngIf="showAddModal || showEditModal" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
+<div class="modal fade show d-block" tabindex="-1" *ngIf="showAddModal || showEditModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content shadow rounded-4">
       <div class="modal-header">
-        <h2>{{ showAddModal ? 'New Booking' : 'Edit Booking' }}</h2>
-        <button class="close-btn" (click)="closeModal()">✕</button>
+        <h5 class="modal-title">{{ showAddModal ? 'New Booking' : 'Edit Booking' }}</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
       </div>
-      
-      <form (ngSubmit)="saveBooking()" #bookingForm="ngForm" class="booking-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="guestId">Guest<span class="required-star">*</span></label>
-            <select
-              id="guestId"
-              name="guestId"
-              [(ngModel)]="currentBooking.guestId"
-              required
-              (change)="onGuestChange()"
-            >
-              <option value="">Select Guest</option>
-              <option *ngFor="let guest of guests" [value]="guest.id">
-                {{ guest.name }} - {{ guest.email }}
+
+      <form (ngSubmit)="saveBooking()">
+        <div class="modal-body row g-3">
+         
+          <div class="col-md-6">
+            <label class="form-label">Guest</label>
+            <select [(ngModel)]="currentBooking.guestId"
+                    name="guestId"
+                    class="form-select"
+                    (change)="onGuestChange()">
+              <option *ngFor="let g of guests" [ngValue]="g.id">{{ g.name }}</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Room</label>
+            <select [(ngModel)]="currentBooking.roomId"
+                    name="roomId"
+                    class="form-select"
+                    (change)="onRoomChange(); calculateTotal(); onAdvanceChange()">
+              <option *ngFor="let r of availableRooms" [ngValue]="r.id">
+                {{ r.number }} - {{ r.type }}
               </option>
             </select>
           </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Check-in</label>
+            <input type="date" class="form-control"
+                   [(ngModel)]="checkInDate"
+                   name="checkInDate"
+                   [min]="today"
+                   (change)="onCheckInChange(); calculateTotal(); onAdvanceChange()">
+          </div>
+
           
-          <div class="form-group">
-            <label for="roomId">Room<span class="required-star">*</span></label>
-            <select
-              id="roomId"
-              name="roomId"
-              [(ngModel)]="currentBooking.roomId"
-              required
-              (change)="onRoomChange()"
-            >
-              <option value="">Select Room</option>
-              <option *ngFor="let room of availableRooms" [value]="room.id">
-                {{ room.number }} - {{ room.type | titlecase }} (${{ room.price }}/night)
-              </option>
-            </select>
+          <div class="col-md-6">
+            <label class="form-label">Check-out</label>
+            <input type="date" class="form-control"
+                   [(ngModel)]="checkOutDate"
+                   name="checkOutDate"
+                   [min]="minCheckoutDate"
+                   (change)="onCheckOutChange(); calculateTotal(); onAdvanceChange()">
+            <small class="text-danger" *ngIf="checkoutError">Checkout date must be after check-in.</small>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Advance Paid</label>
+            <input type="number" class="form-control"
+                   [(ngModel)]="currentBooking.advancePaid"
+                   name="advancePaid"
+                   (input)="onAdvanceChange()">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Remaining</label>
+            <input type="number" class="form-control"
+                   [value]="currentBooking.remainingAmount"
+                   disabled>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Total</label>
+            <input type="number" class="form-control"
+                   [value]="currentBooking.totalAmount"
+                   disabled>
           </div>
         </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="checkIn">Check-in Date<span class="required-star">*</span></label>
-            <input
-              type="date"
-              id="checkIn"
-              name="checkIn"
-              [(ngModel)]="checkInDate"
-              required
-              (change)="calculateTotal()"
-            >
-          </div>
-          
-          <div class="form-group">
-            <label for="checkOut">Check-out Date<span class="required-star">*</span></label>
-            <input
-              type="date"
-              id="checkOut"
-              name="checkOut"
-              [(ngModel)]="checkOutDate"
-              required
-              (change)="calculateTotal()"
-            >
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="status">Status</label>
-            <select
-              id="status"
-              name="status"
-              [(ngModel)]="currentBooking.status"
-              required
-              (change)="onAdvanceChange()"
-            >
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="totalAmount">Total Amount</label>
-            <input
-              type="number"
-              id="totalAmount"
-              name="totalAmount"
-              [(ngModel)]="currentBooking.totalAmount"
-              required
-              readonly
-              class="readonly"
-            >
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="advancePaid">Advance Paid</label>
-            <input
-              type="number"
-              id="advancePaid"
-              name="advancePaid"
-              [(ngModel)]="currentBooking.advancePaid"
-              min="0"
-              (input)="onAdvanceChange()"
-            >
-          </div>
-          
-          <div class="form-group">
-            <label for="remainingAmount">Remaining Amount</label>
-            <input
-              type="number"
-              id="remainingAmount"
-              name="remainingAmount"
-              [(ngModel)]="currentBooking.remainingAmount"
-              readonly
-              class="readonly"
-            >
-          </div>
-        </div>
-
-        <div class="booking-summary" *ngIf="currentBooking.roomId && checkInDate && checkOutDate">
-          <h4>Booking Summary</h4>
-          <div class="summary-item">
-            <span>Guest:</span>
-            <span>{{ getSelectedGuestName() }}</span>
-          </div>
-          <div class="summary-item">
-            <span>Room:</span>
-            <span>{{ getSelectedRoomInfo() }}</span>
-          </div>
-          <div class="summary-item">
-            <span>Duration:</span>
-            <span>{{ displayNights }} nights</span>
-          </div>
-          <div class="summary-item">
-            <span>Room Rate:</span>
-            <span>${{ getRoomPrice() }}/night</span>
-          </div>
-          <div class="summary-item">
-            <span>Room Status After Booking:</span>
-            <span class="status-preview" [class]="getStatusAfterBooking()">
-              {{ getStatusAfterBooking() | titlecase }}
-            </span>
-          </div>
-          <div class="summary-item total">
-            <span>Total Amount:</span>
-            <span>${{ currentBooking.totalAmount }}</span>
-          </div>
-          <div class="summary-item total">
-            <span>Advance Paid:</span>
-            <span>${{ currentBooking.advancePaid || 0 }}</span>
-          </div>
-          <div class="summary-item total">
-            <span>Remaining Amount:</span>
-            <span>${{ currentBooking.status === 'completed' ? 0 : currentBooking.remainingAmount || 0 }}</span>
-          </div>
-        </div>
-
-        <div class="form-actions">
-          <button type="button" class="btn-secondary" (click)="closeModal()">
-            Cancel
-          </button>
-          <button type="submit" class="btn-primary" [disabled]="bookingForm.invalid">
-            {{ showAddModal ? 'Create Booking' : 'Update Booking' }}
-          </button>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">{{ showAddModal ? 'Create' : 'Save' }}</button>
         </div>
       </form>
     </div>

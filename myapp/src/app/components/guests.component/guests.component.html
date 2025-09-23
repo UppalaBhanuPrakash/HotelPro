@@ -5,35 +5,35 @@
           <p>Manage guest information and booking history</p>
         </div>
         <button class="btn-primary" (click)="showAddModal = true">
-          <span class="btn-icon">👤</span>
+          <span class="btn-icon"><i class="bi bi-person-fill"></i></span>
           Add New Guest
         </button>
       </div>
 
       <div class="guests-stats">
         <div class="stat-card total">
-          <div class="stat-icon">👥</div>
+          <div class="stat-icon"><i class="bi bi-people-fill fs-1"></i></div>
           <div class="stat-content">
             <h3>{{ guests.length }}</h3>
             <p>Total Guests</p>
           </div>
         </div>
         <div class="stat-card active">
-          <div class="stat-icon">🏨</div>
+          <div class="stat-icon"><i class="bi bi-building-fill fs-1"></i></div>
           <div class="stat-content">
             <h3>{{ activeGuestsCount }}</h3>
             <p>Active Bookings</p>
           </div>
         </div>
         <div class="stat-card vip">
-          <div class="stat-icon">⭐</div>
+          <div class="stat-icon"><i class="bi bi-star-fill fs-1"></i></div>
           <div class="stat-content">
             <h3>{{ vipGuestsCount }}</h3>
             <p>VIP Guests</p>
           </div>
         </div>
         <div class="stat-card revenue">
-          <div class="stat-icon">💎</div>
+          <div class="stat-icon"><i class="bi bi-gem fs-1"></i></div>
           <div class="stat-content">
             <h3>${{ averageSpending | number:'1.0-0' }}</h3>
             <p>Avg. Spending</p>
@@ -43,7 +43,7 @@
 
       <div class="search-bar">
         <div class="search-input-container">
-          <span class="search-icon">🔍</span>
+          <span class="search-icon"><i class="bi bi-search fs-4"></i></span>
           <input
             type="text"
             placeholder="Search guests by name, email, or phone..."
@@ -67,13 +67,14 @@
             </div>
             <div class="guest-actions">
               <button class="action-btn edit" (click)="editGuest(guest)" title="Edit Guest">
-                ✏️
+                <i class="bi bi-pencil-fill"></i>
+
               </button>
               <button class="action-btn view" (click)="viewGuestDetails(guest)" title="View Details">
-                👁️
+                <i class="bi bi-eye-fill"></i>
               </button>
               <button class="action-btn delete" (click)="deleteGuest(guest.id)" title="Delete Guest">
-                🗑️
+                <i class="bi bi-trash-fill"></i>
               </button>
             </div>
           </div>
@@ -169,7 +170,24 @@
                 >
               </div>
             </div>
-
+<div class="form-group">
+  <label for="guestIdProof">ID Proof <span class="required-star">*</span></label>
+  <input
+    type="file"
+    id="guestIdProof"
+    name="guestIdProof"
+    (change)="onFileSelected($event)"
+    accept=".jpg,.jpeg,.png,.pdf"
+  >
+  
+  <!-- Show uploaded file if exists -->
+  <div *ngIf="currentGuest.idProofPath" class="uploaded-file">
+    <span>Uploaded: </span>
+    <a [href]="currentGuest.idProofPath" target="_blank" rel="noopener">
+      View
+    </a>
+  </div>
+</div>
             <div class="form-group">
               <label for="guestAddress">Address <span class="required-star">*</span></label>
               <textarea
@@ -216,8 +234,17 @@
                     <strong>Address:</strong><br>
                     {{ selectedGuest.address }}
                   </div>
+                  <div class="profile-id-proof" *ngIf="selectedGuest?.idProofPath">
+  <strong>ID Proof:</strong>
+  <a [href]="selectedGuest.idProofPath" target="_blank" rel="noopener">
+    View
+  </a>
+</div>
+
                 </div>
+                
               </div>
+              
 
               <div class="booking-history">
                 <h4>Booking History</h4>
@@ -228,7 +255,9 @@
                       <div class="booking-dates">
                         {{ booking.checkIn | date:'mediumDate' }} - {{ booking.checkOut | date:'mediumDate' }}
                       </div>
+                      
                     </div>
+
                     <div class="booking-meta">
                       <span class="booking-status" [class]="booking.status">
                         {{ booking.status | titlecase }}

@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+// import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HotelService } from '../../services/hotel.service';
 import { Booking, Room, Guest } from '../../models/interfaces';
-
+import { ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+declare var bootstrap: any; 
 @Component({
   selector: 'app-bookings',
   standalone: true,
@@ -12,6 +14,7 @@ import { Booking, Room, Guest } from '../../models/interfaces';
   styleUrls: ['./booking.component.css']
 })
 export class BookingsComponent implements OnInit {
+  @ViewChild('bookingToast') bookingToastRef!: ElementRef;
   bookings: Booking[] = [];
   rooms: Room[] = [];
   guests: Guest[] = [];
@@ -26,36 +29,40 @@ export class BookingsComponent implements OnInit {
 
   checkInDate = '';
   checkOutDate = '';
+  today: string = new Date().toISOString().split('T')[0];
+minCheckoutDate: string = this.today;
 
-  constructor(private hotelService: HotelService) {}
+ 
+constructor(private hotelService: HotelService, private cdr: ChangeDetectorRef) {}
 
  ngOnInit() {
-  this.hotelService.getBookings();
+ this.hotelService.getBookings();
   this.hotelService.getGuests();
-  this.hotelService.getRooms().subscribe(rooms => this.rooms = rooms);
+  this.hotelService.getRooms().subscribe({
+    next: (rooms: Room[]) => this.hotelService['roomsSubject'].next(rooms),
+    error: (err: any) => console.error(err)
+  });
 
+  //  subscribe to reactive streams
   this.hotelService.bookings$.subscribe(bookings => {
     const today = new Date();
 
-    // Loop over all bookings
     bookings.forEach(b => {
       if (
-        b.status !== 'completed' &&   // don’t override already completed
-        b.checkOut instanceof Date && // ensure it's a Date
-        b.checkOut < today            // past checkout
+        b.status !== 'completed' &&
+        b.checkOut instanceof Date &&
+        b.checkOut < today
       ) {
-        // Auto-update status
         this.hotelService.updateBooking(b.id, { status: 'completed' });
-        console.log(`Booking for ${b.guestName} auto-updated to completed`);
       }
     });
 
-    // Sort for display
     this.bookings = [...bookings].sort(
       (a, b) => new Date(b.checkIn).getTime() - new Date(a.checkIn).getTime()
     );
   });
 
+  //  these always reflect updates instantly
   this.hotelService.rooms$.subscribe(rooms => this.rooms = rooms);
   this.hotelService.guests$.subscribe(guests => this.guests = guests);
 }
@@ -101,6 +108,7 @@ export class BookingsComponent implements OnInit {
 
     return true;
   }
+  
 
   get displayNights(): number {
     if (this.checkInDate && this.checkOutDate) {
@@ -109,9 +117,10 @@ export class BookingsComponent implements OnInit {
     return 0;
   }
 
-  get availableRooms(): Room[] {
-    return this.rooms.filter(r => r.status === 'available' || r.id === this.currentBooking.roomId);
-  }
+get availableRooms(): Room[] {
+  const selectedId = this.currentBooking.roomId; // this is a string
+  return this.rooms.filter(r => r.status === 'available' || r.id.toString() === selectedId);
+}
 
   get confirmedCount(): number {
     return this.bookings.filter(b => b.status === 'confirmed').length;
@@ -136,14 +145,24 @@ export class BookingsComponent implements OnInit {
     return Math.round(Math.abs((checkOut.getTime() - checkIn.getTime()) / oneDay));
   }
 
-  editBooking(booking: Booking) {
-    this.currentBooking = { ...booking };
-    this.checkInDate = booking.checkIn.toISOString().split('T')[0];
-    this.checkOutDate = booking.checkOut.toISOString().split('T')[0];
-    this.showEditModal = true;
-    this.calculateTotal();
-  }
+editBooking(booking: Booking) {
+  // Load the selected booking into currentBooking
+  this.currentBooking = { ...booking };
 
+  // Set check-in and check-out dates for date inputs
+  this.checkInDate = booking.checkIn.toISOString().split('T')[0];
+  this.checkOutDate = booking.checkOut.toISOString().split('T')[0];
+
+  // Show the Edit modal
+  this.showEditModal = true;
+
+  // Recalculate total and remaining amounts
+  this.calculateTotal(); // Calculates totalAmount based on room and nights
+  this.onAdvanceChange(); // Updates remainingAmount based on advancePaid
+
+  // Ensure the modal picks up changes immediately
+  this.cdr.detectChanges();
+}
   updateBookingStatus(booking: Booking) {
     const nextStatus = this.getNextStatus(booking.status);
     this.hotelService.updateBooking(booking.id, { status: nextStatus });
@@ -159,6 +178,7 @@ export class BookingsComponent implements OnInit {
       default: return 'pending';
     }
   }
+  
 
   onGuestChange() {
     const selectedGuest = this.guests.find(g => g.id === this.currentBooking.guestId);
@@ -179,25 +199,50 @@ calculateTotal() {
   if (this.checkInDate && this.checkOutDate && this.currentBooking.roomId) {
     const checkIn = new Date(this.checkInDate);
     const checkOut = new Date(this.checkOutDate);
+
     const nights = this.calculateNights(checkIn, checkOut);
     const roomPrice = this.getRoomPrice();
     const total = nights * roomPrice;
 
     this.currentBooking.totalAmount = total;
-    // Remaining amount = total - advancePaid
     this.currentBooking.remainingAmount = (total - (this.currentBooking.advancePaid || 0));
     this.currentBooking.checkIn = checkIn;
     this.currentBooking.checkOut = checkOut;
+
+    
+    this.cdr.detectChanges();
   }
 }
+checkoutError: boolean = false;
+onCheckInChange() {
+  this.calculateTotal();
 
-  onCheckInChange() {
-    this.calculateTotal();
+ if (this.checkInDate) {
+    const checkIn = new Date(this.checkInDate);
+    const nextDay = new Date(checkIn);
+    nextDay.setDate(checkIn.getDate() + 1);
+
+    this.minCheckoutDate = nextDay.toISOString().split('T')[0];
   }
+    this.validateDates();
+}
+
 
   onCheckOutChange() {
     this.calculateTotal();
+  this.validateDates();
+
   }
+  validateDates() {
+  if (this.checkInDate && this.checkOutDate) {
+    const checkIn = new Date(this.checkInDate);
+    const checkOut = new Date(this.checkOutDate);
+
+    this.checkoutError = checkOut <= checkIn; // error if same day or before
+  } else {
+    this.checkoutError = false;
+  }
+}
 
  onAdvanceChange() {
   if (this.currentBooking.status === 'completed') {
@@ -221,6 +266,7 @@ saveBooking() {
   if (this.showAddModal) {
     this.hotelService.addBooking(this.currentBooking as Omit<Booking, 'id'>);
     console.log(`New booking created for ${this.currentBooking.guestName}`);
+        this.showBookingToast(); // Show success toast
   } else if (this.showEditModal && this.currentBooking.id) {
     //  Check if booking was auto-completed but new checkout is in the future
     const now = new Date();
@@ -234,10 +280,12 @@ saveBooking() {
 
     this.hotelService.updateBooking(this.currentBooking.id, this.currentBooking);
     console.log(`Booking updated for ${this.currentBooking.guestName}`);
+        this.showBookingToast(); // Show success toast
   }
 
   this.closeModal();
 }
+
 
 
   closeModal() {
@@ -256,6 +304,19 @@ saveBooking() {
   getSelectedRoomInfo(): string {
     const room = this.rooms.find(r => r.id === this.currentBooking.roomId);
     return room ? `${room.number} - ${room.type}` : 'Select Room';
+  }
+   showBookingToast() {
+    if (this.bookingToastRef) {
+      const toastEl = this.bookingToastRef.nativeElement;
+
+      // Create Bootstrap toast instance
+      const toast = new bootstrap.Toast(toastEl, { 
+        delay: 3000,  // Auto-hide after 3 seconds
+        autohide: true
+      });
+
+      toast.show(); // Show the toast
+    }
   }
 
   getStatusAfterBooking(): string {

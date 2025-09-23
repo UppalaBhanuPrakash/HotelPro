@@ -322,3 +322,14 @@
         width: 100%;
       }
     }
+    .nav-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  stroke-width: 2;
+  vertical-align: middle;
+}
+.icon-bold {
+  stroke-width: 2px;  /* default is 1px */
+  fill: currentColor;  /* keeps color consistent */
+}

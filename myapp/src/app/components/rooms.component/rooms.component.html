@@ -5,35 +5,35 @@
           <p>Manage your hotel rooms, pricing, and availability</p>
         </div>
         <button class="btn-primary" (click)="showAddModal = true">
-          <span class="btn-icon">➕</span>
+          <span class="btn-icon"><i class="bi bi-plus fs-4"></i></span>
           Add New Room
         </button>
       </div>
 
       <div class="rooms-stats">
         <div class="stat-card available">
-          <div class="stat-icon">🟢</div>
+          <div class="stat-icon"><i class="bi bi-circle-fill text-success fs-2"></i></div>
           <div class="stat-content">
             <h3>{{ availableCount }}</h3>
             <p>Available</p>
           </div>
         </div>
         <div class="stat-card occupied">
-          <div class="stat-icon">🔴</div>
+          <div class="stat-icon"><i class="bi bi-circle-fill text-danger fs-2"></i></div>
           <div class="stat-content">
             <h3>{{ occupiedCount }}</h3>
             <p>Occupied</p>
           </div>
         </div>
         <div class="stat-card maintenance">
-          <div class="stat-icon">🔧</div>
+          <div class="stat-icon"><i class="bi bi-wrench fs-2"></i></div>
           <div class="stat-content">
             <h3>{{ maintenanceCount }}</h3>
             <p>Maintenance</p>
           </div>
         </div>
         <div class="stat-card reserved">
-          <div class="stat-icon">🟡</div>
+          <div class="stat-icon"><i class="bi bi-circle-fill text-warning fs-2"></i></div>
           <div class="stat-content">
             <h3>{{ reservedCount }}</h3>
             <p>Reserved</p>
@@ -46,8 +46,8 @@
           <div class="room-header">
             <div class="room-number">{{ room.number }}</div>
             <div class="room-actions">
-              <button class="action-btn edit" (click)="editRoom(room)">✏️</button>
-              <button class="action-btn delete" (click)="deleteRoom(room.id)">🗑️</button>
+              <button class="action-btn edit" (click)="editRoom(room)"><i class="bi bi-pencil-fill"></i></button>
+              <button class="action-btn delete" (click)="deleteRoom(room.id)"><i class="bi bi-trash-fill"></i></button>
             </div>
           </div>
           

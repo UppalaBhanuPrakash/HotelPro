@@ -26,7 +26,7 @@ export class ChangePasswordComponent {
 
     if (success) {
       alert('Password updated successfully!');
-      this.router.navigate(['/signin']); // redirect to login after change
+      this.router.navigate(['/signin']); 
     } else {
       alert('Failed to update password. Please try again.');
     }

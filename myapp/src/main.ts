@@ -5,6 +5,9 @@ import { provideHttpClient } from '@angular/common/http';
 import { RouterOutlet } from '@angular/router';
 import { routes } from './app/app.routes';
 
+import { importProvidersFrom } from '@angular/core';
+import { LucideAngularModule, BarChart2, Home, Users, Settings, LogOut } from 'lucide-angular';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -16,6 +19,9 @@ export class App {}
 bootstrapApplication(App, {
   providers: [
     provideRouter(routes),
-    provideHttpClient()
+    provideHttpClient(),
+    importProvidersFrom(
+      LucideAngularModule.pick({ BarChart2, Home, Users, Settings, LogOut })
+    )
   ]
 });

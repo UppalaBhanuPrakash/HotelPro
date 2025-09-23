@@ -1,71 +1,85 @@
 <div class="app-layout">
-      <aside class="sidebar" [class.collapsed]="sidebarCollapsed" [class.hovered]="sidebarHovered" 
-             (mouseenter)="onSidebarHover(true)" (mouseleave)="onSidebarHover(false)">
-        <div class="sidebar-header">
-          <div class="logo">
-            <div class="logo-icon">🏨</div>
-            <span class="logo-text" *ngIf="!sidebarCollapsed || sidebarHovered">HotelPro</span>
-          </div>
-        </div>
-
-        <nav class="sidebar-nav">
-          <ul class="nav-list">
-            <li class="nav-item">
-              <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
-                <span class="nav-icon">📊</span>
-                <span class="nav-text" *ngIf="!sidebarCollapsed || sidebarHovered">Dashboard</span>
-              </a>
-            </li>
-            <li class="nav-item" *ngIf="hasAccess('rooms')">
-              <a routerLink="/rooms" routerLinkActive="active" class="nav-link">
-                <span class="nav-icon">🏨</span>
-                <span class="nav-text" *ngIf="!sidebarCollapsed || sidebarHovered">Rooms</span>
-              </a>
-            </li>
-            <li class="nav-item" *ngIf="hasAccess('bookings')">
-              <a routerLink="/bookings" routerLinkActive="active" class="nav-link">
-                <span class="nav-icon">📋</span>
-                <span class="nav-text" *ngIf="!sidebarCollapsed || sidebarHovered">Bookings</span>
-              </a>
-            </li>
-            <li class="nav-item" *ngIf="hasAccess('guests')">
-              <a routerLink="/guests" routerLinkActive="active" class="nav-link">
-                <span class="nav-icon">👥</span>
-                <span class="nav-text" *ngIf="!sidebarCollapsed || sidebarHovered">Guests</span>
-              </a>
-            </li>
-             <li class="nav-item" *ngIf="hasAccess('services')">
-              <a routerLink="/service" routerLinkActive="active" class="nav-link">
-                <span class="nav-icon">🛎️</span>
-                <span class="nav-text" *ngIf="!sidebarCollapsed || sidebarHovered">Services</span>
-              </a>
-            </li>
-            <li class="nav-item" *ngIf="hasAccess('settings')">
-              <a routerLink="/settings" routerLinkActive="active" class="nav-link">
-                <span class="nav-icon">⚙️</span>
-                <span class="nav-text" *ngIf="!sidebarCollapsed || sidebarHovered">Settings</span>
-              </a>
-            </li>
-             
-          </ul>
-        </nav>
-
-        <div class="sidebar-footer">
-          <div class="user-profile" *ngIf="currentUser">
-            <div class="user-avatar">{{ currentUser.name.charAt(0) }}</div>
-            <div class="user-info" *ngIf="!sidebarCollapsed || sidebarHovered"><a routerLink="/settings">
-              <div class="user-name">{{ currentUser.name }}</div>
-              <div class="user-role">{{ currentUser.role | titlecase }}</div></a>
-            </div>
-          </div>
-          <button class="logout-btn" (click)="logout()" [title]="(sidebarCollapsed && !sidebarHovered) ? 'Logout' : ''">
-            <span class="logout-icon">🚪</span>
-            <span class="logout-text" *ngIf="!sidebarCollapsed || sidebarHovered">Logout</span>
-          </button>
-        </div>
-      </aside>
-
-      <main class="main-content" [class.expanded]="sidebarCollapsed" [class.sidebar-hovered]="sidebarHovered">
-        <router-outlet></router-outlet>
-      </main>
+  <aside class="sidebar" [class.collapsed]="!sidebarHovered" [class.hovered]="sidebarHovered" 
+         (mouseenter)="onSidebarHover(true)" (mouseleave)="onSidebarHover(false)">
+    <div class="sidebar-header">
+      <div class="logo d-flex align-items-center">
+        <i class="bi bi-building-fill fs-3 me-2 icon-bold"></i>
+        <span class="logo-text" *ngIf="sidebarHovered">
+          <a routerLink="/dashboard">HotelPro</a>
+        </span>
+      </div>
     </div>
+
+    <nav class="sidebar-nav">
+      <ul class="nav-list list-unstyled p-0">
+        <li class="nav-item">
+          <a routerLink="/dashboard" routerLinkActive="active" class="nav-link d-flex align-items-center">
+            <i class="bi bi-bar-chart-line-fill me-2 icon-bold"></i>
+            <span class="nav-text" *ngIf="sidebarHovered">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="hasAccess('rooms')">
+          <a routerLink="/rooms" routerLinkActive="active" class="nav-link d-flex align-items-center">
+            <i class="bi bi-building-fill me-2 icon-bold"></i>
+            <span class="nav-text" *ngIf="sidebarHovered">Rooms</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="hasAccess('bookings')">
+          <a routerLink="/bookings" routerLinkActive="active" class="nav-link d-flex align-items-center">
+            <i class="bi bi-journal-check me-2 icon-bold"></i>
+            <span class="nav-text" *ngIf="sidebarHovered">Bookings</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="hasAccess('guests')">
+          <a routerLink="/guests" routerLinkActive="active" class="nav-link d-flex align-items-center">
+            <i class="bi bi-people-fill me-2 icon-bold"></i>
+            <span class="nav-text" *ngIf="sidebarHovered">Guests</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="hasAccess('services')">
+          <a routerLink="/service" routerLinkActive="active" class="nav-link d-flex align-items-center">
+            <i class="bi bi-bell-fill me-2 icon-bold"></i>
+            <span class="nav-text" *ngIf="sidebarHovered">Services</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="hasAccess('userBooking')">
+          <a routerLink="/userBooking" routerLinkActive="active" class="nav-link d-flex align-items-center">
+            <i class="bi bi-person-check-fill me-2 icon-bold"></i>
+            <span class="nav-text" *ngIf="sidebarHovered">User Booking</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="hasAccess('settings')">
+          <a routerLink="/settings" routerLinkActive="active" class="nav-link d-flex align-items-center">
+            <i class="bi bi-gear-fill me-2 icon-bold"></i>
+            <span class="nav-text" *ngIf="sidebarHovered">Settings</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+<div class="sidebar-footer p-2">
+  <!-- User Profile -->
+  <div class="user-profile mb-2" *ngIf="currentUser">
+    <div class="user-avatar rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mb-1">
+      {{ currentUser.name.charAt(0) }}
+    </div>
+    <div class="user-info" *ngIf="sidebarHovered">
+      <a routerLink="/settings" class="text-decoration-none text-dark d-block">
+        <div class="user-name" style="color: white;">{{ currentUser.name }}</div>
+        <div class="user-role">{{ currentUser.role | titlecase }}</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Logout Button -->
+  <button class="logout-btn btn btn-outline-secondary w-100 d-flex align-items-center justify-content-start"  (click)="logout()" [title]="(!sidebarHovered) ? 'Logout' : ''">
+   <i class="bi bi-power fs-4"></i>
+    <span class="logout-text" *ngIf="sidebarHovered">Logout</span>
+  </button>
+</div>
+
+  </aside>
+
+  <main class="main-content" [class.expanded]="!sidebarHovered" [class.sidebar-hovered]="sidebarHovered">
+    <router-outlet></router-outlet>
+  </main>
+</div>

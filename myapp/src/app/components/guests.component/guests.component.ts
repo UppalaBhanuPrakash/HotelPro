@@ -21,6 +21,21 @@ export class GuestsComponent implements OnInit {
   showDetailsModal = false;
   currentGuest: Partial<Guest> = this.getEmptyGuest();
   selectedGuest: Guest | null = null;
+  selectedFile: File | null = null;
+
+onFileSelected(event: any) {
+  const file: File | null = event.target.files?.[0] ?? null;
+  if (!file) return;
+
+  this.selectedFile = file;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    this.currentGuest.idProofPath = reader.result as string;
+    console.log('ID Proof Base64:', this.currentGuest.idProofPath);
+  };
+  reader.readAsDataURL(file); 
+}
 
   get activeGuestsCount(): number {
     return this.guests.filter(guest =>
@@ -45,10 +60,9 @@ export class GuestsComponent implements OnInit {
   constructor(private hotelService: HotelService) {}
 
   ngOnInit() {
-     // fetch first
-  this.hotelService.getGuests();
+  // this.hotelService.getGuests();
 
-  // then subscribe
+
   this.hotelService.guests$.subscribe(guests => {
     this.guests = guests;
     this.filterGuests();
@@ -58,15 +72,20 @@ export class GuestsComponent implements OnInit {
     this.bookings = bookings;
   });;
   }
-
-  saveGuest() {
-    if (this.showAddModal) {
-      this.hotelService.addGuest(this.currentGuest as Omit<Guest, 'id' | 'bookings'>);
-    } else if (this.showEditModal && this.currentGuest.id) {
-      this.hotelService.updateGuest(this.currentGuest.id, this.currentGuest);
-    }
-    this.closeModal();
+saveGuest() {
+  if (this.showAddModal) {
+    this.hotelService.addGuest({
+      ...this.currentGuest,
+      idProofPath: this.currentGuest.idProofPath || ''
+    } as Omit<Guest, 'id' | 'bookings'>);
+  } else if (this.showEditModal && this.currentGuest.id) {
+    this.hotelService.updateGuest(this.currentGuest.id, {
+      ...this.currentGuest,
+      idProofPath: this.currentGuest.idProofPath || ''
+    });
   }
+  this.closeModal();
+}
 
   deleteGuest(guestId: string) {
     const hasActiveBookings = this.bookings.some(booking =>
@@ -125,7 +144,6 @@ getGuestStatus(guestId: string): string {
   const totalSpent = this.getGuestTotalSpent(guestId);
 
   if (totalSpent > 1000 && !guest.isVip) {
-    //  Automatically upgrade guest to VIP in DB
     const updatedGuest: Partial<Guest> = {
       isVip: true,
       vipLevel: guest.vipLevel || 'bronze',
@@ -177,12 +195,6 @@ toggleVipStatus(guest: Guest) {
   };
 
   this.hotelService.updateGuest(guest.id, updatedGuest);
-
-
-  // setTimeout(() => {
-  //   this.guests = this.guests.map(g => g.id === guest.id ? updatedGuest : g);
-  //   this.filterGuests();
-  // }, 0);
 }
 
   onVipToggle() {

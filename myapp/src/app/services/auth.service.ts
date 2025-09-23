@@ -17,6 +17,22 @@ export class AuthService {
       this.currentUserSubject.next(JSON.parse(savedUser));
     }
   }
+
+
+getRole(): string | null {
+  return this.currentUserSubject.value?.role || null;
+}
+
+// Check if user has a specific role
+hasRole(role: string): boolean {
+  return this.getRole() === role;
+}
+
+// Check if user has one of allowed roles
+hasAnyRole(roles: string[]): boolean {
+  return roles.includes(this.getRole() || '');
+}
+
   //  Existing SignIn (unchanged)
   signIn(email: string, password: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
@@ -59,6 +75,7 @@ export class AuthService {
         // Create new user with next id
         const user: User = {
           id: (maxId + 1).toString(),
+          password,
           email,
           name,
           role: 'staff'
@@ -183,13 +200,11 @@ export class AuthService {
     });
   }
 
- 
-  //  Fetch all users (optional helper)
   getAllUsers() {
     return this.http.get<User[]>(this.baseUrl);
   }
 
-  //  Delete user by ID (optional helper)
+
   deleteUser(id: string) {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }

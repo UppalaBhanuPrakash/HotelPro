@@ -1,730 +1,279 @@
- <div class="settings-container">
-      <div class="settings-header">
-        <h1>Settings</h1>
-        <p>Manage your account, security, and system preferences</p>
-      </div>
-      
-      <div class="settings-tabs">
-        <button 
-          class="tab-btn" 
-          [class.active]="activeTab === 'profile'"
-          (click)="activeTab = 'profile'"
-        >
-          <span class="tab-icon">👤</span>
-          Profile
-        </button>
-        <button 
-          class="tab-btn" 
-          [class.active]="activeTab === 'security'"
-          (click)="activeTab = 'security'"
-        >
-          <span class="tab-icon">🔐</span>
-          Change Password
-        </button>
-        <button 
-          class="tab-btn" 
-          [class.active]="activeTab === 'account'"
-          (click)="activeTab = 'account'"
-        >
-          <span class="tab-icon">📧</span>
-          Account
-        </button>
-      <!-- Tabs -->
-<button 
-  class="tab-btn" 
-  [class.active]="activeTab === 'users'"
-  (click)="activeTab = 'users'"
-  *ngIf="canManageUsers()"
->
-  <span class="tab-icon">👥</span>
-  User Management
-</button>
-        <button 
-          class="tab-btn" 
-          [class.active]="activeTab === 'permissions'"
-          (click)="activeTab = 'permissions'"
-          *ngIf="currentUser?.role === 'admin'"
-        >
-          <span class="tab-icon">🔑</span>
-          Permissions
-        </button>
-        <button 
-          class="tab-btn" 
-          [class.active]="activeTab === 'system'"
-          (click)="activeTab = 'system'"
-          *ngIf="currentUser?.role === 'admin'"
-        >
-          <span class="tab-icon">⚙️</span>
-          System
-        </button>
-        <button 
-          class="tab-btn" 
-          [class.active]="activeTab === 'notifications'"
-          (click)="activeTab = 'notifications'"
-        >
-          <span class="tab-icon">🔔</span>
-          Notifications
-        </button>
-      </div>
-
-      <!-- Profile Tab -->
-<div class="tab-content" *ngIf="activeTab === 'profile'">
-  <div class="settings-card">
-    <div class="card-header">
-      <h2>Profile Information</h2>
-      <p>Update your personal information and preferences</p>
-    </div>
-    
-    <form (ngSubmit)="updateProfile()" #profileForm="ngForm" class="settings-form">
-      <div class="form-row">
-        <!-- Full Name -->
-        <div class="form-group">
-          <label for="name">Full Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            [(ngModel)]="profileData.name"
-            required
-            minlength="2"
-            pattern="^[a-zA-Z ]+$"
-            #nameRef="ngModel"
-          >
-          <!-- Error Messages -->
-          <div class="error-message" *ngIf="nameRef.invalid && nameRef.touched">
-            <div *ngIf="nameRef.errors?.['required']">Full Name is required.</div>
-            <div *ngIf="nameRef.errors?.['minlength']">Full Name must be at least 2 characters.</div>
-            <div *ngIf="nameRef.errors?.['pattern']">Special characters are not allowed.</div>
-          </div>
-        </div>
-
-        <!-- Email -->
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            [(ngModel)]="profileData.email"
-            required
-            email
-            #emailRef="ngModel"
-          >
-          <div class="error-message" *ngIf="emailRef.invalid && emailRef.touched">
-            <div *ngIf="emailRef.errors?.['required']">Email is required.</div>
-            <div *ngIf="emailRef.errors?.['email']">Enter a valid email address.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <!-- Phone -->
-        <div class="form-group">
-          <label for="phone">Phone Number</label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            [(ngModel)]="profileData.phone"
-            required
-            pattern="^[0-9]{10}$"
-            #phoneRef="ngModel"
-            maxlength="10"
-          >
-          <div class="error-message" *ngIf="phoneRef.invalid && phoneRef.touched">
-            <div *ngIf="phoneRef.errors?.['required']">Phone number is required.</div>
-            <div *ngIf="phoneRef.errors?.['pattern']">Phone number must be 10 digits only and no special Character.</div>
-          </div>
-        </div>
-
-        <!-- Department -->
-        <div class="form-group">
-          <label for="department">Department</label>
-          <select id="department" name="department" [(ngModel)]="profileData.department">
-            <option value="">Select Department</option>
-            <option value="management">Management</option>
-            <option value="front-desk">Front Desk</option>
-            <option value="housekeeping">Housekeeping</option>
-            <option value="maintenance">Maintenance</option>
-            <option value="food-service">Food Service</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Bio -->
-      <div class="form-group">
-        <label for="bio">Bio</label>
-        <textarea
-          id="bio"
-          name="bio"
-          [(ngModel)]="profileData.bio"
-          rows="4"
-          placeholder="Tell us about yourself..."
-        ></textarea>
-      </div>
-
-      <div class="form-actions">
-        <button 
-          type="submit" 
-          class="btn-primary" 
-          [disabled]="profileForm.invalid || profileLoading">
-          <span *ngIf="profileLoading" class="loading-spinner"></span>
-          {{ profileLoading ? 'Updating...' : 'Update Profile' }}
-        </button>
-      </div>
-    </form>
+<div class="container py-4">
+  <!-- Header -->
+  <div class="mb-4">
+    <h1 class="fw-bold">Settings</h1>
+    <p class="text-muted">Manage your account, security, and user preferences</p>
   </div>
-</div>
 
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'profile'" (click)="activeTab = 'profile'"><i class="bi bi-person-fill"></i> Profile</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'security'" (click)="activeTab = 'security'"><i class="bi bi-lock-fill"></i> Change Password</a>
+    </li>
+    <li class="nav-item" *ngIf="canManageUsers()">
+      <a class="nav-link" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'"><i class="bi bi-people-fill"></i> User Management</a>
+    </li>
+    <li class="nav-item" *ngIf="currentUser?.role === 'admin'">
+      <a class="nav-link" [class.active]="activeTab === 'permissions'" (click)="activeTab = 'permissions'"><i class="bi bi-key-fill"></i> Permissions</a>
+    </li>
+  </ul>
 
-      <!-- Security Tab -->
-      <div class="tab-content" *ngIf="activeTab === 'security'">
-        <div class="settings-card">
-          <div class="card-header">
-            <h2>Change Password</h2>
-            <p>Keep your account secure with a strong password</p>
-          </div>
-          
-          <form (ngSubmit)="changePassword()" #passwordForm="ngForm" class="settings-form">
-            <div class="form-group">
-              <label for="currentPassword">Current Password<span class="required-star">*</span></label>
-              <input
-                type="password"
-                id="currentPassword"
-                name="currentPassword"
-                [(ngModel)]="passwordData.currentPassword"
-                required
-                minlength="6"
-                placeholder="Enter your current password"
-              >
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="newPassword">New Password<span class="required-star">*</span></label>
-                <input
-                  type="password"
-                  id="newPassword"
-                  name="newPassword"
-                  [(ngModel)]="passwordData.newPassword"
-                  required
-                  minlength="6"
-                  placeholder="Enter new password"
-                >
-              </div>
-              
-              <div class="form-group">
-                <label for="confirmPassword">Confirm New Password<span class="required-star">*</span></label>
-                <input
-                  type="password"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  [(ngModel)]="passwordData.confirmPassword"
-                  required
-                  minlength="6"
-                  placeholder="Confirm new password"
-                >
-                <div class="error-message" *ngIf="passwordMismatch && passwordData.confirmPassword.length > 0">
-                  Passwords do not match
-                </div>
-              </div>
-            </div>
-
-            <div class="password-requirements">
-              <h4>Password Requirements:</h4>
-              <ul>
-                <li [class.valid]="passwordData.newPassword.length >= 8">At least 8 characters</li>
-                <li [class.valid]="hasUppercase(passwordData.newPassword)">One uppercase letter</li>
-                <li [class.valid]="hasLowercase(passwordData.newPassword)">One lowercase letter</li>
-                <li [class.valid]="hasNumber(passwordData.newPassword)">One number</li>
-                <li [class.valid]="hasSpecialChar(passwordData.newPassword)">One special character</li>
-              </ul>
-            </div>
-
-            <div class="success-message" *ngIf="passwordChangeSuccess">
-              Password changed successfully!
-            </div>
-
-            <div class="error-message" *ngIf="passwordChangeError">
-              {{ passwordChangeError }}
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="btn-primary" [disabled]="passwordForm.invalid || passwordLoading || passwordMismatch">
-                <span *ngIf="passwordLoading" class="loading-spinner"></span>
-                {{ passwordLoading ? 'Changing...' : 'Change Password' }}
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div class="settings-card">
-          <div class="card-header">
-            <h2>Two-Factor Authentication</h2>
-            <p>Add an extra layer of security to your account</p>
-          </div>
-          
-          <div class="two-factor-section">
-            <div class="two-factor-status">
-              <div class="status-indicator" [class.enabled]="twoFactorEnabled">
-                <span class="status-icon">{{ twoFactorEnabled ? '🔒' : '🔓' }}</span>
-                <div class="status-text">
-                  <h4>Two-Factor Authentication</h4>
-                  <p>{{ twoFactorEnabled ? 'Enabled' : 'Disabled' }}</p>
-                </div>
-              </div>
-              <button 
-                class="btn-toggle" 
-                [class.enabled]="twoFactorEnabled"
-                (click)="toggleTwoFactor()"
-              >
-                {{ twoFactorEnabled ? 'Disable' : 'Enable' }}
-              </button>
-            </div>
-          </div>
-        </div>
+  <!-- PROFILE -->
+  <div *ngIf="activeTab === 'profile'">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">Profile Information</h5>
+        <small class="text-muted">Update your personal information and preferences</small>
       </div>
+      <div class="card-body">
+        <form (ngSubmit)="updateProfile()" #profileForm="ngForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="name" class="form-label">Full Name</label>
+              <input id="name" name="name" class="form-control"
+                     type="text"
+                     [(ngModel)]="profileData.name"
+                     required minlength="2" pattern="^[a-zA-Z ]+$"
+                     #nameRef="ngModel">
+              <div *ngIf="nameRef.invalid && nameRef.touched" class="text-danger small mt-1">
+                <div *ngIf="nameRef.errors?.['required']">Full Name is required.</div>
+                <div *ngIf="nameRef.errors?.['minlength']">Full Name must be at least 2 characters.</div>
+                <div *ngIf="nameRef.errors?.['pattern']">Special characters are not allowed.</div>
+              </div>
+            </div>
 
-      <!-- Account Tab -->
-      <div class="tab-content" *ngIf="activeTab === 'account'">
-        <div class="settings-card">
-          <div class="card-header">
-            <h2>Account Settings</h2>
-            <p>Update your email address and account preferences</p>
+            <div class="col-md-6">
+              <label for="email" class="form-label">Email Address</label>
+              <input id="email" name="email" class="form-control" type="email"
+                     [(ngModel)]="profileData.email" required email #emailRef="ngModel">
+              <div *ngIf="emailRef.invalid && emailRef.touched" class="text-danger small mt-1">
+                <div *ngIf="emailRef.errors?.['required']">Email is required.</div>
+                <div *ngIf="emailRef.errors?.['email']">Enter a valid email address.</div>
+              </div>
+            </div>
           </div>
-          
-          <form (ngSubmit)="updateAccount()" #accountForm="ngForm" class="settings-form">
-            <div class="form-group">
-              <label for="currentEmail">Current Email Address<span class="required-star">*</span></label>
-              <input
-                type="email"
-                id="currentEmail"
-                name="currentEmail"
-                [value]="currentUser?.email"
-                readonly
-                class="readonly"
-              >
-            </div>
 
-            <div class="form-group">
-              <label for="newEmail">New Email Address<span class="required-star">*</span></label>
-              <input
-                type="email"
-                id="newEmail"
-                name="newEmail"
-                [(ngModel)]="accountData.newEmail"
-                required
-                email
-                placeholder="Enter new email address"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="confirmEmail">Confirm New Email<span class="required-star">*</span></label>
-              <input
-                type="email"
-                id="confirmEmail"
-                name="confirmEmail"
-                [(ngModel)]="accountData.confirmEmail"
-                required
-                email
-                placeholder="Confirm new email address"
-              >
-              <div class="error-message" *ngIf="emailMismatch && accountData.confirmEmail.length > 0">
-                Email addresses do not match
+          <div class="row g-3 mt-2">
+            <div class="col-md-6">
+              <label for="phone" class="form-label">Phone Number</label>
+              <input id="phone" name="phone" class="form-control" type="tel"
+                     [(ngModel)]="profileData.phone"
+                     pattern="^[0-9]{10}$" maxlength="10" #phoneRef="ngModel">
+              <div *ngIf="phoneRef.invalid && phoneRef.touched" class="text-danger small mt-1">
+                <div *ngIf="phoneRef.errors?.['pattern']">Phone number must be 10 digits only and no special character.</div>
               </div>
             </div>
 
-            <div class="form-group">
-              <label for="accountPassword">Current Password (for verification)<span class="required-star">*</span></label>
-              <input
-                type="password"
-                id="accountPassword"
-                name="accountPassword"
-                [(ngModel)]="accountData.password"
-                required
-                minlength="6"
-                placeholder="Enter your current password"
-              >
+            <div class="col-md-6">
+              <label for="department" class="form-label">Department</label>
+              <select id="department" name="department" class="form-select" [(ngModel)]="profileData.department">
+                <option value="">Select Department</option>
+                <option value="management">Management</option>
+                <option value="front-desk">Front Desk</option>
+                <option value="housekeeping">Housekeeping</option>
+                <option value="maintenance">Maintenance</option>
+                <option value="food-service">Food Service</option>
+              </select>
             </div>
+          </div>
 
-            <div class="account-preferences">
-              <h4>Account Preferences</h4>
-              <div class="preference-item">
-                <label class="preference-label">
-                  <input type="checkbox" [(ngModel)]="accountData.emailVerification" name="emailVerification">
-                  <span class="checkmark"></span>
-                  Require email verification for changes
-                </label>
-              </div>
-              
-              <div class="preference-item">
-                <label class="preference-label">
-                  <input type="checkbox" [(ngModel)]="accountData.loginNotifications" name="loginNotifications">
-                  <span class="checkmark"></span>
-                  Send notifications for new logins
-                </label>
-              </div>
-            </div>
+          <div class="mt-3">
+            <label for="bio" class="form-label">Bio</label>
+            <textarea id="bio" name="bio" class="form-control" rows="4" [(ngModel)]="profileData.bio" placeholder="Tell us about yourself..."></textarea>
+          </div>
 
-            <div class="form-actions">
-              <button type="submit" class="btn-primary" [disabled]="accountForm.invalid || accountLoading || emailMismatch">
-                <span *ngIf="accountLoading" class="loading-spinner"></span>
-                {{ accountLoading ? 'Updating...' : 'Update Email' }}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- User Management Tab -->
-      <div class="tab-content" *ngIf="activeTab === 'users' && currentUser?.role === 'admin'">
-        <div class="settings-card">
-          <!-- <div class="card-header">
-            <h2>User Management</h2>
-            <p>Manage user accounts and permissions</p>
-            <button class="btn-primary" (click)="showAddUserModal = true">
-              <span class="btn-icon">➕</span>
-              Add User
+          <div class="mt-4">
+            <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || profileLoading">
+              <span *ngIf="profileLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ profileLoading ? 'Updating...' : 'Update Profile' }}
             </button>
-          </div> -->
-          
-          <div class="tab-content" *ngIf="activeTab === 'users' && currentUser?.role === 'admin'">
-  <div class="settings-card">
-    <div class="card-header">
-      <h2>User Management</h2>
-      <p>Manage user accounts and permissions</p>
-      <button class="btn-primary" (click)="showRoleSelection = true">
-        <span class="btn-icon">➕</span>
-        Add User
-      </button>
-    </div>
-
-    <!-- Role Selection Modal -->
-    <div class="modal-backdrop" *ngIf="showRoleSelection">
-      <div class="modal">
-        <h3>Select User Role</h3>
-        <div class="role-options">
-          <button class="btn-primary" (click)="selectRole('admin')">Create Admin</button>
-          <button class="btn-primary" (click)="selectRole('staff')">Create Staff</button>
-          <button class="btn-cancel" (click)="showRoleSelection = false">Cancel</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Create User Form -->
-    <div class="modal-backdrop" *ngIf="showUserForm">
-      <div class="modal">
-        <h3>Create {{ selectedRole | titlecase }}</h3>
-        <form (ngSubmit)="createUser()" #userForm="ngForm" class="settings-form">
-          <div class="form-group">
-            <label for="newUserEmail">Email</label>
-            <input
-              type="email"
-              id="newUserEmail"
-              name="email"
-              [(ngModel)]="newUser.email"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="newUserPassword">Password</label>
-            <input
-              type="password"
-              id="newUserPassword"
-              name="password"
-              [(ngModel)]="newUser.password"
-              required
-              minlength="6"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              [(ngModel)]="newUser.confirmPassword"
-              required
-              minlength="6"
-            />
-            <div class="error-message" *ngIf="passwordMismatch">
-              Passwords do not match
-            </div>
-          </div>
-
-          <div class="form-actions">
-            <button type="submit" class="btn-primary" [disabled]="userForm.invalid || passwordMismatch">
-              Create User
-            </button>
-            <button type="button" class="btn-cancel" (click)="showUserForm = false">Cancel</button>
           </div>
         </form>
       </div>
     </div>
+  </div>
 
-    <!-- Existing Users Table -->
-    <div class="users-table">
-      <div class="table-header">
-        <div class="table-cell">User</div>
-        <div class="table-cell">Role</div>
-        <div class="table-cell">Status</div>
-        <div class="table-cell">Last Login</div>
-        <div class="table-cell">Actions</div>
+  <!-- SECURITY -->
+  <div *ngIf="activeTab === 'security'">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header">
+        <h5>Change Password</h5>
+        <small class="text-muted">Keep your account secure with a strong password</small>
       </div>
-      
-      <div class="table-row" *ngFor="let user of filteredUsers">
-        <div class="table-cell user-info">
-          <div class="user-avatar">{{ getUserInitials(user.name || user.email) }}</div>
-          <div class="user-details">
-            <div class="user-email">{{ user.email }}</div>
+      <div class="card-body">
+        <form (ngSubmit)="changePassword()" #passwordForm="ngForm">
+          <div class="mb-3">
+            <label for="currentPassword" class="form-label">Current Password<span class="text-danger">*</span></label>
+            <input id="currentPassword" name="currentPassword" class="form-control" type="password"
+                   [(ngModel)]="passwordData.currentPassword" required minlength="6">
           </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="newPassword" class="form-label">New Password<span class="text-danger">*</span></label>
+              <input id="newPassword" name="newPassword" class="form-control" type="password"
+                     [(ngModel)]="passwordData.newPassword" required minlength="6">
+            </div>
+            <div class="col-md-6">
+              <label for="confirmPassword" class="form-label">Confirm New Password<span class="text-danger">*</span></label>
+              <input id="confirmPassword" name="confirmPassword" class="form-control" type="password"
+                     [(ngModel)]="passwordData.confirmPassword" required minlength="6">
+              <div class="text-danger small mt-1" *ngIf="passwordMismatch && passwordData.confirmPassword.length > 0">Passwords do not match</div>
+            </div>
+          </div>
+
+          <div class="password-requirements mt-3">
+            <h6>Password Requirements:</h6>
+            <ul class="small">
+              <li [class.text-success]="passwordData.newPassword.length >= 8">At least 8 characters</li>
+              <li [class.text-success]="hasUppercase(passwordData.newPassword)">One uppercase letter</li>
+              <li [class.text-success]="hasLowercase(passwordData.newPassword)">One lowercase letter</li>
+              <li [class.text-success]="hasNumber(passwordData.newPassword)">One number</li>
+              <li [class.text-success]="hasSpecialChar(passwordData.newPassword)">One special character</li>
+            </ul>
+          </div>
+
+          <div class="mt-3">
+            <div *ngIf="passwordChangeSuccess" class="alert alert-success">Password changed successfully!</div>
+            <div *ngIf="passwordChangeError" class="alert alert-danger">{{ passwordChangeError }}</div>
+            <button type="submit" class="btn btn-primary" [disabled]="passwordForm.invalid || passwordLoading || passwordMismatch">
+              <span *ngIf="passwordLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ passwordLoading ? 'Changing...' : 'Change Password' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- USER MANAGEMENT -->
+  <div *ngIf="activeTab === 'users'">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="mb-0">User Management</h5>
+          <small class="text-muted">Manage user accounts and permissions</small>
         </div>
-        <div class="table-cell">{{ user.role | titlecase }}</div>
-        <div class="table-cell">{{ user.status | titlecase }}</div>
-        <div class="table-cell">{{ user.lastLogin | date:'short' }}</div>
-        <div class="table-cell actions">
-          <button class="action-btn reset" (click)="resetPassword(user)">🔑 Reset Password</button>
-          <button class="action-btn delete" (click)="deleteUser(user.id)">🗑️</button>
+        <div>
+          <button class="btn btn-primary me-2" (click)="showRoleSelection = true"><i class="bi bi-plus icon-bold"></i>  New User</button>  
+        </div>
+      </div>
+
+      <div class="card-body">
+        <!-- Optional filters/search can be added here if you want -->
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Last Login</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of filteredUsers">
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center me-2" style="width:36px;height:36px;">
+                      {{ getUserInitials(user.name || user.email) }}
+                    </div>
+                    <div>
+                      <div>{{ user.name || user.email }}</div>
+                      <div class="small text-muted">{{ user.email }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ user.role | titlecase }}</td>
+                <td>{{ user.status | titlecase }}</td>
+                <td>{{ user.lastLogin | date:'short' }}</td>
+                <td>
+                  <button class="btn btn-sm btn-warning me-1" (click)="resetPassword(user)"><i class="bi bi-key-fill"></i> Reset Password</button>
+                  <button class="btn btn-sm btn-danger" (click)="deleteUser(user.id)"><i class="bi bi-trash"></i></button>
+                </td>
+              </tr>
+              <tr *ngIf="filteredUsers.length === 0">
+                <td colspan="5" class="text-center text-muted">No users found</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Role Selection (Angular-driven modal) -->
+    <div class="modal-backdrop d-flex justify-content-center align-items-center" *ngIf="showRoleSelection" style="position:fixed;inset:0;z-index:1050;background:rgba(0,0,0,0.4);">
+      <div class="card p-3" style="max-width:420px;width:100%;">
+        <div class="mb-3">
+          <h5>Select User Role</h5>
+        </div>
+        <div class="d-grid gap-2">
+          <button class="btn btn-primary" (click)="selectRole('admin')">Create Admin</button>
+          <button class="btn btn-primary" (click)="selectRole('staff')">Create Staff</button>
+          <button class="btn btn-secondary" (click)="showRoleSelection = false">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create User Form Modal (Angular-driven) -->
+    <div class="modal-backdrop d-flex justify-content-center align-items-center" *ngIf="showUserForm" style="position:fixed;inset:0;z-index:1050;background:rgba(0,0,0,0.4);">
+      <div class="modal-dialog modal-dialog-centered" style="max-width:540px;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Create {{ selectedRole | titlecase }}</h5>
+            <button type="button" class="btn-close" aria-label="Close" (click)="showUserForm=false"></button>
+          </div>
+          <div class="modal-body">
+            <form (ngSubmit)="createUser()" #userForm="ngForm">
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input name="newUserEmail" class="form-control" type="email" [(ngModel)]="newUser.email" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input name="newUserPassword" class="form-control" type="password" [(ngModel)]="newUser.password" required minlength="6">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Confirm Password</label>
+                <input name="newUserConfirm" class="form-control" type="password" [(ngModel)]="newUser.confirmPassword" required minlength="6">
+                <div *ngIf="newUser.password !== newUser.confirmPassword " class="text-danger small mt-1">Passwords do not match</div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary cancel" (click)="showUserForm=false">Cancel</button>
+            <button class="btn btn-primary" [disabled]="!newUser.email || !newUser.password || newUser.password !== newUser.confirmPassword" (click)="createUser()">Create User</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-          <!-- <div class="user-filters">
-            <div class="filter-group">
-              <label for="roleFilter">Filter by Role:</label>
-              <select id="roleFilter" [(ngModel)]="userFilter.role" (change)="filterUsers()">
-                <option value="">All Roles</option>
-                <option value="admin">Admin</option>
-                <option value="staff">Staff</option>
-                <option value="guest">Guest</option>
-              </select>
-            </div>
-            
-            <div class="filter-group">
-              <label for="statusFilter">Filter by Status:</label>
-              <select id="statusFilter" [(ngModel)]="userFilter.status" (change)="filterUsers()">
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-            </div>
-            
-            <div class="search-group">
-              <input
-                type="text"
-                placeholder="Search users..."
-                [(ngModel)]="userFilter.search"
-                (input)="filterUsers()"
-                class="search-input"
-              >
-            </div>
-          </div>
 
-          <div class="users-table">
-            <div class="table-header">
-              <div class="table-cell">User</div>
-              <div class="table-cell">Role</div>
-              <div class="table-cell">Status</div>
-              <div class="table-cell">Last Login</div>
-              <div class="table-cell">Permissions</div>
-              <div class="table-cell">Actions</div>
-            </div>
-            
-            <div class="table-row" *ngFor="let user of filteredUsers">
-              <div class="table-cell user-info">
-                <div class="user-avatar">{{ getUserInitials(user.name) }}</div>
-                <div class="user-details">
-                  <div class="user-name">{{ user.name }}</div>
-                  <div class="user-email">{{ user.email }}</div>
-                </div>
-              </div>
-              <div class="table-cell">
-                <span class="role-badge" [class]="user.role">{{ user.role | titlecase }}</span>
-              </div>
-              <div class="table-cell">
-                <span class="status-badge" [class]="user.status">{{ user.status | titlecase }}</span>
-              </div>
-              <div class="table-cell">{{ user.lastLogin | date:'short' }}</div>
-              <div class="table-cell">
-                <div class="permissions-list">
-                  <span class="permission-tag" *ngFor="let permission of user.permissions.slice(0, 2)">
-                    {{ permission }}
-                  </span>
-                  <span class="permission-more" *ngIf="user.permissions.length > 2">
-                    +{{ user.permissions.length - 2 }} more
-                  </span>
-                </div>
-              </div>
-              <div class="table-cell actions">
-                <button class="action-btn edit" (click)="editUser(user)">✏️</button>
-                <button class="action-btn permissions" (click)="managePermissions(user)">🔑</button>
-                <button class="action-btn toggle" (click)="toggleUserStatus(user)">
-                  {{ user.status === 'active' ? '🚫' : '✅' }}
-                </button>
-                <button class="action-btn delete" (click)="deleteUser(user.id)">🗑️</button>
-              </div>
-            </div>
-          </div> -->
-        </div>
-      </div>
-
-      <!-- Permissions Tab -->
-      <div class="tab-content" *ngIf="activeTab === 'permissions' && currentUser?.role === 'admin'">
-        <div class="settings-card">
-          <div class="card-header">
-            <h2>Role Permissions</h2>
-            <p>Configure permissions for different user roles</p>
-          </div>
-          
-          <div class="permissions-matrix">
-            <div class="role-section" *ngFor="let role of roles">
-              <h3>{{ role.name }} Permissions</h3>
-              <div class="permissions-grid">
-                <div class="permission-item" *ngFor="let permission of availablePermissions">
-                  <label class="permission-label">
-                    <input 
-                      type="checkbox" 
-                      [checked]="role.permissions.includes(permission.key)"
-                      (change)="toggleRolePermission(role.key, permission.key)"
-                    >
-                    <span class="checkmark"></span>
-                    <div class="permission-info">
-                      <span class="permission-name">{{ permission.name }}</span>
-                      <span class="permission-description">{{ permission.description }}</span>
-                    </div>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-actions">
-            <button class="btn-primary" (click)="savePermissions()">
-              Save Permission Changes
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- System Tab -->
-      <div class="tab-content" *ngIf="activeTab === 'system' && currentUser?.role === 'admin'">
-        <div class="settings-card">
-          <div class="card-header">
-            <h2>System Configuration</h2>
-            <p>Configure system-wide settings and preferences</p>
-          </div>
-          
-          <div class="system-settings">
-            <div class="setting-group">
-              <h3>General Settings</h3>
-              <div class="setting-item">
-                <label class="setting-label">
-                  <input type="checkbox" [(ngModel)]="systemSettings.maintenanceMode">
-                  <span class="checkmark"></span>
-                  Maintenance Mode
-                </label>
-                <p class="setting-description">Enable maintenance mode to restrict access</p>
-              </div>
-              
-              <div class="setting-item">
-                <label class="setting-label">
-                  <input type="checkbox" [(ngModel)]="systemSettings.autoBackup">
-                  <span class="checkmark"></span>
-                  Automatic Backups
-                </label>
-                <p class="setting-description">Automatically backup data daily</p>
-              </div>
-            </div>
-
-            <div class="setting-group">
-              <h3>Security Settings</h3>
-              <div class="setting-item">
-                <label class="setting-label">
-                  <input type="checkbox" [(ngModel)]="systemSettings.forcePasswordChange">
-                  <span class="checkmark"></span>
-                  Force Password Change
-                </label>
-                <p class="setting-description">Require users to change passwords every 90 days</p>
-              </div>
-              
-              <div class="setting-item">
-                <label class="setting-label">
-                  <input type="checkbox" [(ngModel)]="systemSettings.sessionTimeout">
-                  <span class="checkmark"></span>
-                  Session Timeout
-                </label>
-                <p class="setting-description">Automatically log out inactive users</p>
+  <!-- PERMISSIONS -->
+  <div *ngIf="activeTab === 'permissions' && currentUser?.role === 'admin'">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header"><h5>Role Permissions</h5></div>
+      <div class="card-body">
+        <div *ngFor="let role of roles" class="mb-4">
+          <h6>{{ role.name }} Permissions</h6>
+          <div class="row">
+            <div class="col-md-4 mb-2" *ngFor="let permission of availablePermissions">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox"
+                       [checked]="role.permissions.includes(permission.key)"
+                       (change)="toggleRolePermission(role.key, permission.key)">
+                <label class="form-check-label">{{ permission.name }}</label>
+                <div class="small text-muted">{{ permission.description }}</div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Notifications Tab -->
-      <div class="tab-content" *ngIf="activeTab === 'notifications'">
-        <div class="settings-card">
-          <div class="card-header">
-            <h2>Notification Preferences</h2>
-            <p>Choose how you want to be notified</p>
-          </div>
-          
-          <div class="notification-settings">
-            <div class="notification-group">
-              <h3>Email Notifications</h3>
-              <div class="notification-item">
-                <label class="notification-label">
-                  <input type="checkbox" [(ngModel)]="notificationSettings.emailBookings">
-                  <span class="checkmark"></span>
-                  New Bookings
-                </label>
-              </div>
-              
-              <div class="notification-item">
-                <label class="notification-label">
-                  <input type="checkbox" [(ngModel)]="notificationSettings.emailCancellations">
-                  <span class="checkmark"></span>
-                  Booking Cancellations
-                </label>
-              </div>
-              
-              <div class="notification-item">
-                <label class="notification-label">
-                  <input type="checkbox" [(ngModel)]="notificationSettings.emailPayments">
-                  <span class="checkmark"></span>
-                  Payment Confirmations
-                </label>
-              </div>
-            </div>
-
-            <div class="notification-group">
-              <h3>Push Notifications</h3>
-              <div class="notification-item">
-                <label class="notification-label">
-                  <input type="checkbox" [(ngModel)]="notificationSettings.pushBookings">
-                  <span class="checkmark"></span>
-                  New Bookings
-                </label>
-              </div>
-              
-              <div class="notification-item">
-                <label class="notification-label">
-                  <input type="checkbox" [(ngModel)]="notificationSettings.pushReminders">
-                  <span class="checkmark"></span>
-                  Check-in Reminders
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-actions">
-            <button class="btn-primary" (click)="saveNotificationSettings()">
-              Save Preferences
-            </button>
-          </div>
-        </div>
+        <button class="btn btn-primary" (click)="savePermissions()">Save Permission Changes</button>
       </div>
     </div>
+  </div>
+</div>

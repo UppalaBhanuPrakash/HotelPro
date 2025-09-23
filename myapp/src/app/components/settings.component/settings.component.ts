@@ -15,6 +15,8 @@ export interface AppUser {
   status: 'active' | 'inactive';
   lastLogin: string;
   permissions: string[];
+    phone?: string; 
+    password:string;
 }
 
 @Component({
@@ -89,7 +91,7 @@ ngOnInit(): void {
     this.loadUsers()
   // Fetch from UserManagement DB instead of main users DB
   this.http.get<AppUser[]>(this.Url).subscribe(users => {
-    this.managedUsers = users; // now comes from UserManagement
+    this.managedUsers = users; 
     this.filteredUsers = [...users];
   });
 
@@ -139,13 +141,7 @@ ngOnInit(): void {
     });
   }
 
-  // deleteUser(userId: string): void {
-  //   if (!confirm('Are you sure you want to delete this user?')) return;
-  //   this.http.delete(`${this.dbUrl}/${userId}`).subscribe(() => {
-  //     this.managedUsers = this.managedUsers.filter(u => u.id !== userId);
-  //     this.filterUsers();
-  //   });
-  // }
+ 
 
   addUser(newUser: AppUser): void {
     this.http.post<AppUser>(this.dbUrl, newUser).subscribe(user => {
@@ -185,21 +181,27 @@ async updateProfile(): Promise<void> {
   this.profileLoading = true;
 
   try {
-    // Prepare the updated data
-    const updatedUser = {
-      ...this.currentUser,
+    // Build update object from scratch
+    const updatedUser: Partial<AppUser> = {
+      id: this.currentUser.id,
       name: this.profileData.name,
       email: this.profileData.email,
-      phone: this.profileData.phone
+      status: 'active',
+      lastLogin: this.currentUser.lastLogin,
+      role: this.currentUser.role,
+      permissions: this.currentUser.permissions
     };
 
-    // Send PATCH request to the User DB
+    // Add phone only if not empty
+    if (this.profileData.phone && this.profileData.phone.trim() !== '') {
+      updatedUser.phone = this.profileData.phone.trim();
+    }
+
     this.http.patch<AppUser>(`${this.dbUrl}/${this.currentUser.id}`, updatedUser)
       .subscribe({
         next: (response) => {
-          // Update local state
           this.currentUser = response;
-          this.authService.updateCurrentUser(response); // use a method in AuthService to safely update observable
+          this.authService.updateCurrentUser(response);
           localStorage.setItem('currentUser', JSON.stringify(response));
 
           alert('Profile updated successfully!');
@@ -213,6 +215,7 @@ async updateProfile(): Promise<void> {
     this.profileLoading = false;
   }
 }
+
 
 
   async updateAccount(): Promise<void> {
@@ -337,11 +340,10 @@ savePermissions(): void {
   editUser(user: AppUser): void { console.log('Edit user:', user); }
   managePermissions(user: AppUser): void { console.log('Manage permissions:', user); }
 
-  // canManageUsers(): boolean { return this.currentUser?.role === 'admin'; }
   canAccessSystemSettings(): boolean { return this.currentUser?.role === 'admin'; }
   saveNotificationSettings(): void { console.log('Notification settings saved:', this.notificationSettings); }
 
-  // HELPERS  
+ 
   getDefaultPermissions(role: 'admin' | 'staff' | 'guest'): string[] {
     const r = this.roles.find(r => r.key === role);
     return r ? [...r.permissions] : [];
@@ -364,52 +366,74 @@ showRoleSelection = false;
     this.showUserForm = true;
   }
 
-  async createUser() {
+ async createUser() {
   if (!this.newUser.email || !this.newUser.password || !this.selectedRole) {
     alert('Please fill in all required fields');
     return;
   }
 
-  const user: AppUser = {
-    id: crypto.randomUUID(),  // generate unique ID
-    name: this.newUser.email.split('@')[0], // fallback name
-    email: this.newUser.email,
-    role: this.selectedRole,
-    status: 'active',
-    lastLogin: new Date().toISOString(),
-    permissions: this.getDefaultPermissions(this.selectedRole)
-  };
-
   try {
-    //  Save user in backend
-    const createdUser = await this.http.post<AppUser>(this.Url, user).toPromise();
+    // 1. Load existing users from MAIN users DB
+    const users = await this.http.get<User[]>(this.dbUrl).toPromise();
+
+    // 2. Find max ID in USERS table
+    const maxId = users && users.length > 0
+      ? Math.max(...users.map(u => Number(u.id)))
+      : 0;
+
+    // 3. Generate next ID
+    const nextId = (maxId + 1).toString();
+
+    // 4. Insert into MAIN users table (only allowed fields)
+    const newUserEntry: User = {
+      id: nextId,
+      email: this.newUser.email,
+      name: this.newUser.email.split('@')[0],
+      role: this.selectedRole,
+      phone: '',
+      password:this.newUser.password,
+    };
+
+    await this.http.post<User>(this.dbUrl, newUserEntry).toPromise();
+
+    // 5. Insert into UserManagement (full details)
+    const managementUser: AppUser = {
+      id: nextId,
+      name: newUserEntry.name,
+      email: newUserEntry.email,
+      role: newUserEntry.role,
+      status: 'active',
+      lastLogin: new Date().toISOString(),
+      permissions: this.getDefaultPermissions(this.selectedRole),
+      phone: '',
+      password:newUserEntry.password,
+    };
+
+    const createdUser = await this.http.post<AppUser>(this.Url, managementUser).toPromise();
 
     if (createdUser) {
-      //  Update local list without refresh
       this.managedUsers.push(createdUser);
       this.filterUsers();
     }
 
-    //  Send email with login credentials
-    const templateParams = {
-      email: user.email,
-      password: this.newUser.password
-    };
-
-    await emailjs.send(
-      'YOUR_SERVICE_ID',
-      'YOUR_TEMPLATE_ID',
-      templateParams,
-      'YOUR_PUBLIC_KEY'
-    );
+    // 6. Send email
+    const templateParams = { email: newUserEntry.email, password: this.newUser.password };
+    await emailjs.send('service_7isdned', 'template_9x2xhts', templateParams, 'r5qxB0JYxzao5YQyP');
 
     alert('User created successfully & email sent!');
-    this.newUser = { email: '', password: '', confirmPassword: '' }; // reset form
+    this.newUser = { email: '', password: '', confirmPassword: '' };
+    this.selectedRole = null;
+
+    this.showAddUserModal = false;
+    this.showUserForm = false;
+
+
   } catch (err) {
     console.error('Error creating user:', err);
-    alert('Failed to create user');
+    alert(`Failed to create user: ${err}`);
   }
 }
+
   resetPassword(user: AppUser): void {
     const tempPassword = 'Temp@123';
     const updatedUser = { ...user, password: tempPassword, forcePasswordChange: true };

@@ -4,6 +4,7 @@ import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/rou
 import { AuthService } from '../../../services/auth.service';
 import { User } from '../../../models/interfaces';
 
+
 @Component({
   selector: 'app-main-layout',
   standalone: true,
@@ -12,7 +13,7 @@ import { User } from '../../../models/interfaces';
   styleUrl:'./main-layout.component.css' 
 })
 export class MainLayoutComponent implements OnInit {
-  sidebarCollapsed = true;
+  
   sidebarHovered = false;
   currentUser: User | null = null;
 
@@ -25,10 +26,6 @@ export class MainLayoutComponent implements OnInit {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
     });
-  }
-
-  toggleSidebar() {
-    this.sidebarCollapsed = !this.sidebarCollapsed;
   }
 
   onSidebarHover(hovered: boolean) {
@@ -46,7 +43,7 @@ export class MainLayoutComponent implements OnInit {
     const permissions = {
       'admin': ['dashboard', 'rooms', 'bookings', 'guests', 'settings', 'services'],
       'staff': ['dashboard', 'rooms', 'bookings', 'guests', 'settings','services'],
-      'guest': ['dashboard', 'settings']
+      'guest': ['dashboard', 'settings','userBooking']
     };
     
     return permissions[this.currentUser.role]?.includes(feature) || false;

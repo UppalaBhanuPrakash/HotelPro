@@ -4,6 +4,7 @@ export interface User {
   name: string;
   role: 'admin' | 'staff' | 'guest';
   phone?: string;
+  password:string;
 }
 
 export type ServiceType = 'housekeeping' | 'maintenance' | 'room-service' | 'concierge' | 'laundry';
@@ -31,6 +32,7 @@ export interface Booking {
   roomNumber: string;
   advancePaid?: number; 
   remainingAmount?: number; 
+    idProof?: string;
 }
 
 export interface Guest {
@@ -44,6 +46,7 @@ export interface Guest {
   vipLevel?: 'bronze' | 'silver' | 'gold' | 'platinum';
   loyaltyPoints: number;
   bookings: Booking[];
+     idProofPath?: string;
 }
 
 
@@ -73,3 +76,17 @@ export interface ServiceRequest {
   assignedTo?: string;
   completedAt?: Date;
 }
+
+
+// export interface Payment {
+//   id?: string;                // JSON Server will auto-generate
+//   bookingId: string;          // Link payment to booking
+//   razorpayPaymentId: string;  // from Razorpay response
+//   razorpayOrderId?: string;   // optional (if you generate orders)
+//   razorpaySignature?: string; // optional
+//   amount: number;             // in INR
+//   currency: string;           // "INR"
+//   status: 'success' | 'failed' | 'pending';
+//   method: string;             // "card", "upi", etc.
+//   createdAt: Date;
+// }

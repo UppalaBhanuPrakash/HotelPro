@@ -1,6 +1,6 @@
 <div class="rooms-grid">
-  <div class="room-card" *ngFor="let room of availableRooms">
-    <img src="https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500">
+  <div class="room-card" *ngFor="let room of allRooms | sortPipe:'number'">
+    <img src="https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt="Room image">
     <h3>{{ room.number }} - {{ room.type }}</h3>
     <p>Price per night: ₹{{ room.price }}</p>
     <p>Amenities: {{ room.amenities.join(', ') }}</p>
@@ -8,24 +8,58 @@
   </div>
 </div>
 
-<!-- Booking Form Modal -->
-<div class="booking-form" *ngIf="showBookingForm">
-  <h2>Book Room {{ selectedRoom.number }}</h2>
-  <label>Guest Name:
-    <input type="text" [(ngModel)]="guestName" />
-  </label>
-  <label>Government ID:
-    <input type="text" [(ngModel)]="governmentId" />
-  </label>
-  <label>Check-In:
-    <input type="date" [(ngModel)]="checkInDate" (change)="calculateTotal()" />
-  </label>
-  <label>Check-Out:
-    <input type="date" [(ngModel)]="checkOutDate" (change)="calculateTotal()" />
-  </label>
-  <p>Total Cost: ₹{{ totalCost }}</p>
-  <button (click)="payNow()">Pay Now</button>
-  <button (click)="showBookingForm=false">Cancel</button>
+<div class="modal-overlay" *ngIf="showBookingForm">
+  <div class="booking-form">
+    <h2>Book Room {{ selectedRoom.number }}</h2>
+    <label>
+      <div class="label-text-wrapper">
+        <span class="label-text">Guest Name</span><span class="required">*</span>
+      </div>
+      <input type="text" [(ngModel)]="guestName" (blur)="validateGuestName()" required />
+      <p class="error" *ngIf="guestNameError">{{ guestNameError }}</p>
+    </label>
+
+    <label>
+      <div class="label-text-wrapper">
+        <span class="label-text">Government ID</span><span class="required">*</span>
+      </div>
+      <input type="text" [(ngModel)]="governmentId" (blur)="validateGovernmentId()" required />
+      <p class="error" *ngIf="governmentIdError">{{ governmentIdError }}</p>
+    </label>
+
+    <label>
+      <div class="label-text-wrapper">
+        <span class="label-text">Guest ID Proof</span><span class="required">*</span>
+      </div>
+      <input type="file" (change)="onFileSelected($event)" accept="image/*,.pdf" required />
+      <p class="error" *ngIf="idProofError">{{ idProofError }}</p>
+      <img *ngIf="idProofPreview && isImageFile" [src]="idProofPreview" alt="ID Preview" class="id-preview" />
+    </label>
+
+    <label>
+      <div class="label-text-wrapper">
+        <span class="label-text">Check-In</span><span class="required">*</span>
+      </div>
+      <input type="date" [(ngModel)]="checkInDate" (change)="onCheckInChange()" required />
+      <p class="error" *ngIf="checkInError">{{ checkInError }}</p>
+    </label>
+
+    <label>
+      <div class="label-text-wrapper">
+        <span class="label-text">Check-Out</span><span class="required">*</span>
+      </div>
+      <input type="date" [(ngModel)]="checkOutDate" (change)="onCheckOutChange()" required />
+      <p class="error" *ngIf="checkOutError">{{ checkOutError }}</p>
+    </label>
+
+    <p *ngIf="!dateError">Total Cost: ₹{{ totalCost }}</p>
+    <p *ngIf="dateError" class="error">{{ dateError }}</p>
+
+    <button (click)="payNow()">Pay Now</button>
+    <button (click)="showBookingForm=false">Cancel</button>
+  </div>
 </div>
 
-<p *ngIf="bookingMessage" class="success">{{ bookingMessage }}</p>
+<div [ngClass]="{'toast': true, 'show': showToast, 'hide': !showToast}">
+  {{ toastMessage }}
+</div>
