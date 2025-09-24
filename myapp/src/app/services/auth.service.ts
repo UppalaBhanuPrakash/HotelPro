@@ -23,17 +23,14 @@ getRole(): string | null {
   return this.currentUserSubject.value?.role || null;
 }
 
-// Check if user has a specific role
 hasRole(role: string): boolean {
   return this.getRole() === role;
 }
 
-// Check if user has one of allowed roles
 hasAnyRole(roles: string[]): boolean {
   return roles.includes(this.getRole() || '');
 }
 
-  //  Existing SignIn (unchanged)
   signIn(email: string, password: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       // Fetch user from db.json
@@ -45,7 +42,7 @@ hasAnyRole(roles: string[]): boolean {
             localStorage.setItem('currentUser', JSON.stringify(user));
             resolve(true);
           } else {
-            resolve(false); // No matching user
+            resolve(false);
           }
         },
         error: (err) => {
@@ -59,29 +56,27 @@ hasAnyRole(roles: string[]): boolean {
 
   signUp(email: string, password: string, name: string): Promise<boolean> {
   return new Promise((resolve, reject) => {
-    // First fetch ALL users
     this.http.get<User[]>(this.baseUrl).subscribe({
       next: (users) => {
-        // Check if email exists
         if (users.some(u => u.email === email)) {
           reject('Email already exists');
           return;
         }
         
 
-        // Find max id
+      
         const maxId = users.length > 0 ? Math.max(...users.map(u => +u.id)) : 0;
 
-        // Create new user with next id
+    
         const user: User = {
           id: (maxId + 1).toString(),
           password,
           email,
           name,
-          role: 'staff'
+          role: 'guest'
         };
 
-        // Save user in db.json
+    
         this.http.post<User>(this.baseUrl, { ...user, password }).subscribe({
           next: (response) => {
             this.currentUserSubject.next(response);
@@ -102,7 +97,7 @@ hasAnyRole(roles: string[]): boolean {
   });
 }
 
-  //  Update Email with password verification
+
   updateEmail(newEmail: string, password: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const currentUser = this.currentUserSubject.value;
@@ -112,7 +107,7 @@ hasAnyRole(roles: string[]): boolean {
         return;
       }
 
-      // Verify the entered password
+     
       this.http
         .get<User[]>(`${this.baseUrl}?email=${currentUser.email}&password=${password}`)
         .subscribe({
@@ -122,7 +117,7 @@ hasAnyRole(roles: string[]): boolean {
               return;
             }
 
-            // Check if new email already exists
+          
             this.http.get<User[]>(`${this.baseUrl}?email=${newEmail}`).subscribe({
               next: (existingUsers) => {
                 if (existingUsers.length > 0) {
@@ -159,7 +154,6 @@ hasAnyRole(roles: string[]): boolean {
   }
 
 
-  //  Change password (used in Settings)
   changePassword(currentPassword: string, newPassword: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const currentUser = this.currentUserSubject.value;
@@ -169,7 +163,6 @@ hasAnyRole(roles: string[]): boolean {
         return;
       }
 
-      // Verify old password
       this.http.get<any[]>(`${this.baseUrl}?email=${currentUser.email}&password=${currentPassword}`).subscribe({
         next: (users) => {
           if (users.length > 0) {
@@ -189,7 +182,7 @@ hasAnyRole(roles: string[]): boolean {
               }
             });
           } else {
-            resolve(false); // wrong current password
+            resolve(false); 
           }
         },
         error: (err) => {
@@ -211,13 +204,12 @@ hasAnyRole(roles: string[]): boolean {
 
  
 
-  //  SignOut (same as before)
   signOut(): void {
     this.currentUserSubject.next(null);
     localStorage.removeItem('currentUser');
   }
 
-  //  Get current user
+ 
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }
@@ -230,7 +222,7 @@ hasAnyRole(roles: string[]): boolean {
     return this.currentUserSubject.value;
   }
 
-  //  Check if authenticated
+ 
   isAuthenticated(): boolean {
     return this.currentUserSubject.value !== null;
   }
@@ -246,7 +238,7 @@ hasAnyRole(roles: string[]): boolean {
         this.http.put(`${this.baseUrl}/${currentUser.id}`, updatedUser)
       );
 
-      // update localStorage + BehaviorSubject
+ 
       this.currentUserSubject.next(updatedUser);
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
 
