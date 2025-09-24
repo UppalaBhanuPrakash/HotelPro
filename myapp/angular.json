@@ -83,8 +83,7 @@
             ],
             "styles": [
               "src/styles.css"
-            ],
-              "outputPath": "docs"
+            ]
           }
         }
       }

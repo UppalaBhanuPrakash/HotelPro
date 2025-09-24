@@ -53,22 +53,19 @@ getMonthlyRevenue(month: number, year: number): number {
     .reduce((sum, b) => sum + b.totalAmount, 0);
 }
 
-//Get Rooms
 getRooms(): Observable<Room[]> {
     return this.http.get<Room[]>(`${this.baseUrl}/rooms`);
   }
 
-  // ADD a room
   addRoom(room: Omit<Room, 'id'>): Observable<Room> {
     return this.http.post<Room>(`${this.baseUrl}/rooms`, room);
   }
 
-  // UPDATE a room
+ 
   updateRoom(id: string, room: Partial<Room>): Observable<Room> {
     return this.http.patch<Room>(`${this.baseUrl}/rooms/${id}`, room);
   }
 
-  // DELETE a room
   deleteRoom(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/rooms/${id}`);
   }
@@ -115,31 +112,29 @@ updateBooking(id: string, booking: Partial<Booking>): void {
 }
 
   addBooking(booking: Omit<Booking, 'id'>): void {
-  // Get current bookings
+ 
   const currentBookings = this.bookingsSubject.value;
 
-  // Convert existing ids to numbers, find max
+ 
   const maxId = currentBookings.length
     ? Math.max(...currentBookings.map(b => Number(b.id) || 0))
     : 0;
 
-  // Assign new id as max + 1
   const newBooking: Booking = { ...booking, id: (maxId + 1).toString() };
 
   this.http.post<Booking>(`${this.baseUrl}/bookings`, newBooking).subscribe(added => {
-    // Update local bookings
+
     this.bookingsSubject.next([...currentBookings, {
       ...added,
       checkIn: new Date(added.checkIn),
       checkOut: new Date(added.checkOut)
     }]);
 
-    // Determine room status
     let roomStatus: Room['status'] = 'available';
     if (added.status === 'confirmed') roomStatus = 'occupied';
     else if (added.status === 'pending') roomStatus = 'reserved';
 
-    // Update room in backend + local cache
+   
     this.updateRoom(added.roomId, { status: roomStatus }).subscribe(updatedRoom => {
       const updatedRooms = this.roomsSubject.value.map(r =>
         r.id === updatedRoom.id ? updatedRoom : r
@@ -155,7 +150,7 @@ uploadGovernmentId(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     this.http.post<{ filePath: string }>('http://localhost:3000/upload', formData)
       .subscribe({
-        next: (res) => resolve(res.filePath), // return path like "/uploads/abc.pdf"
+        next: (res) => resolve(res.filePath), 
         error: (err) => reject(err)
       });
   });
@@ -180,15 +175,13 @@ uploadGovernmentId(file: File): Promise<string> {
     
     this.updateRoom(roomId, { status: roomStatus });
   }
-
-  // Guest methods
+ 
   getGuests(): void {
     this.http.get<Guest[]>(`${this.baseUrl}/guests`).subscribe(guests => {
       this.guestsSubject.next(guests);
     });
   }
 addGuest(guest: Omit<Guest, 'id' | 'bookings'>): void {
-  // Fetch all guests first
   this.http.get<Guest[]>(`${this.baseUrl}/guests`).subscribe({
     next: (guests) => {
       const maxId = guests.length > 0 ? Math.max(...guests.map(g => +g.id)) : 0;
@@ -201,9 +194,8 @@ addGuest(guest: Omit<Guest, 'id' | 'bookings'>): void {
         loyaltyPoints: guest.loyaltyPoints || 0
       };
 
-      // Save new guest
       this.http.post<Guest>(`${this.baseUrl}/guests`, newGuest).subscribe(() => {
-        this.getGuests(); // refresh list after adding
+        this.getGuests(); 
       });
     },
     error: (err) => {
@@ -220,7 +212,7 @@ updateGuest(id: string, updatedGuest: Partial<Guest>): void {
       const newList = current.map(g =>
         g.id === id ? { ...g, ...savedGuest } : g
       );
-      this.guestsSubject.next(newList); //  UI updates automatically
+      this.guestsSubject.next(newList); 
     },
     error: (err) => {
       console.error(`Error updating guest with id ${id}:`, err);
@@ -229,38 +221,29 @@ updateGuest(id: string, updatedGuest: Partial<Guest>): void {
 }
 deleteGuest(id: string): void {
   this.http.delete<void>(`${this.baseUrl}/guests/${id}`).subscribe(() => {
-    this.getGuests(); // refresh list after delete
+    this.getGuests();
   });
 }
-
-
- //  Fetch all users
 
 private userManagementUrl = `${this.baseUrl}/UserManagement`;
 
 
-
-// Fetch all UserManagement users
 getUserManagement(): Observable<AppUser[]> {
   return this.http.get<AppUser[]>(this.userManagementUrl);
 }
 
-// Fetch a single UserManagement user by ID
 getUserManagementById(id: string): Observable<AppUser> {
   return this.http.get<AppUser>(`${this.userManagementUrl}/${id}`);
 }
 
-// Add a new user to UserManagement
 addUserManagement(user: Omit<AppUser, 'id'>): Observable<AppUser> {
   return this.http.post<AppUser>(this.userManagementUrl, user);
 }
 
-// Update an existing UserManagement user
 updateUserManagement(id: string, updated: Partial<AppUser>): Observable<AppUser> {
   return this.http.patch<AppUser>(`${this.userManagementUrl}/${id}`, updated);
 }
 
-// Delete a UserManagement user
 deleteUserManagement(id: string): Observable<void> {
   return this.http.delete<void>(`${this.userManagementUrl}/${id}`);
 }
